@@ -1,0 +1,194 @@
+name: Package Desktop Application
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g. v0.1.1, v0.1.6, v0.1.9, v0.1.10, v0.1.11, v0.1.12, v0.1.13)'
+        required: true
+        default: 'v0.1.13'
+      release_title:
+        description: 'Release Title'
+        required: false
+        default: 'Avyro Protocol Desktop Release'
+      release_body:
+        description: 'Release Notes / Description'
+        required: false
+        default: 'Official native multi-platform release of Avyro Protocol self-custody smart account for Robinhood Chain.'
+
+permissions:
+  contents: write
+
+jobs:
+  build-tauri:
+    name: Build (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+            target: 'aarch64-apple-darwin'
+            artifact-name: 'macos-arm64'
+          - platform: 'ubuntu-22.04'
+            args: ''
+            target: 'x86_64-unknown-linux-gnu'
+            artifact-name: 'linux-x64'
+          - platform: 'windows-latest'
+            args: ''
+            target: 'x86_64-pc-windows-msvc'
+            artifact-name: 'windows-x64'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine version and update configurations
+        id: version_step
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RAW_VER="${{ github.event.inputs.version }}"
+            REL_TITLE="${{ github.event.inputs.release_title }}"
+            REL_BODY="${{ github.event.inputs.release_body }}"
+          else
+            RAW_VER="${{ github.ref_name }}"
+            REL_TITLE="Avyro Protocol Desktop ${RAW_VER}"
+            REL_BODY="Official native multi-platform release of Avyro Protocol self-custody smart account for Robinhood Chain."
+          fi
+          SEMVER="${RAW_VER#v}"
+          TAG="v${SEMVER}"
+          echo "tag_name=${TAG}" >> $GITHUB_OUTPUT
+          echo "semver=${SEMVER}" >> $GITHUB_OUTPUT
+          echo "release_title=${REL_TITLE:-Avyro Protocol Desktop $TAG}" >> $GITHUB_OUTPUT
+          echo "release_body=${REL_BODY}" >> $GITHUB_OUTPUT
+          echo "VITE_APP_VERSION=${SEMVER}" >> $GITHUB_ENV
+
+          python3 -c "
+          import json, re
+          semver = '$SEMVER'
+          with open('desktop/src-tauri/tauri.conf.json', 'r') as f:
+              data = json.load(f)
+          data['version'] = semver
+          with open('desktop/src-tauri/tauri.conf.json', 'w') as f:
+              json.dump(data, f, indent=2)
+
+          with open('desktop/package.json', 'r') as f:
+              pkg = json.load(f)
+          pkg['version'] = semver
+          with open('desktop/package.json', 'w') as f:
+              json.dump(pkg, f, indent=2)
+
+          with open('desktop/src-tauri/Cargo.toml', 'r') as f:
+              cargo = f.read()
+          cargo = re.sub(r'version = \"[^\"]+\"', f'version = \"{semver}\"', cargo, count=1)
+          with open('desktop/src-tauri/Cargo.toml', 'w') as f:
+              f.write(cargo)
+          "
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            librsvg2-dev \
+            patchelf \
+            libssl-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libayatana-appindicator3-dev
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './desktop/src-tauri -> target'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build SDK
+        working-directory: ./sdk
+        run: |
+          bun install
+          bun run build
+          bun link
+
+      - name: Install Desktop dependencies
+        working-directory: ./desktop
+        run: |
+          bun install
+          bun link @avyro/protocol-sdk
+
+      - name: Build Desktop frontend
+        working-directory: ./desktop
+        run: bun run build
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: './desktop'
+          tagName: ${{ steps.version_step.outputs.tag_name }}
+          releaseName: ${{ steps.version_step.outputs.release_title }}
+          releaseBody: ${{ steps.version_step.outputs.release_body }}
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
+
+      - name: Package standalone Linux tarball
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          mkdir -p desktop-dist/avyro
+          cp desktop/src-tauri/target/release/avyro-desktop desktop-dist/avyro/
+          cp desktop/src-tauri/icons/128x128.png desktop-dist/avyro/avyro.png
+          cat << 'EOF' > desktop-dist/avyro/avyro.desktop
+          [Desktop Entry]
+          Name=Avyro Protocol
+          Comment=Private 2-of-3 Threshold Self-Custody on Robinhood Chain
+          Exec=avyro-desktop
+          Icon=avyro
+          Terminal=false
+          Type=Application
+          Categories=Utility;Finance;
+          EOF
+          cat << 'EOF' > desktop-dist/avyro/install.sh
+          #!/usr/bin/env bash
+          set -e
+          BIN_DIR="${HOME}/.local/bin"
+          APP_DIR="${HOME}/.local/share/applications"
+          ICON_DIR="${HOME}/.local/share/icons/hicolor/128x128/apps"
+          mkdir -p "$BIN_DIR" "$APP_DIR" "$ICON_DIR"
+          SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+          cp "$SCRIPT_DIR/avyro-desktop" "$BIN_DIR/avyro-desktop"
+          ln -sf "$BIN_DIR/avyro-desktop" "$BIN_DIR/avyro"
+          chmod +x "$BIN_DIR/avyro-desktop"
+          cp "$SCRIPT_DIR/avyro.png" "$ICON_DIR/avyro.png"
+          cp "$SCRIPT_DIR/avyro.desktop" "$APP_DIR/avyro.desktop"
+          echo "Avyro Protocol installed successfully to ~/.local/bin/avyro"
+          EOF
+          chmod +x desktop-dist/avyro/install.sh
+          tar -czvf desktop/src-tauri/target/release/bundle/avyro-linux-x64-standalone.tar.gz -C desktop-dist avyro
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: avyro-${{ matrix.artifact-name }}
+          path: |
+            desktop/src-tauri/target/${{ matrix.target }}/release/bundle/
+            desktop/src-tauri/target/release/bundle/
+          if-no-files-found: warn

@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --avyro-bg: #050505;
+  --avyro-surface: #0d0d0d;
+  --avyro-surface-2: #141414;
+  --avyro-line: rgba(255,255,255,.11);
+  --avyro-text: #f7f7f4;
+  --avyro-muted: #90908b;
+}
+
+@layer base {
+  html, body, #root { min-height: 100%; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 70% 0%, rgba(255,255,255,.06), transparent 34rem),
+      linear-gradient(#050505, #070707);
+    color: var(--avyro-text);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  input, textarea, select, button { font-family: inherit; }
+
+  ::selection { background: #ffffff; color: #050505; }
+  * { scrollbar-width: thin; scrollbar-color: #303030 #080808; }
+}
+
+@layer utilities {
+  .avyro-glass {
+    background: rgba(13,13,13,.78);
+    border: 1px solid var(--avyro-line);
+    backdrop-filter: blur(20px);
+  }
+  .avyro-grid {
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 42px 42px;
+  }
+}
+
+/* AVYRO desktop black / white theme switch. The app uses a dense dark Tailwind
+   surface system, so the light theme mirrors that monochrome system without
+   changing semantic transaction colors or image artwork. */
+.avyro-desktop-dark {
+  transition: filter 240ms ease, background-color 240ms ease;
+}
+.avyro-desktop-light {
+  filter: invert(1) hue-rotate(180deg);
+  transition: filter 240ms ease, background-color 240ms ease;
+}
+.avyro-desktop-light img,
+.avyro-desktop-light video,
+.avyro-desktop-light canvas,
+.avyro-desktop-light svg[data-preserve-tone] {
+  filter: invert(1) hue-rotate(180deg);
+}
