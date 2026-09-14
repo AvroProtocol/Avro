@@ -1,0 +1,66 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_ENV: test
+  PORT: 3001
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/avyro_test
+  SHARD_B_ENCRYPTION_KEY: 97bc58b23128c5097358f49d5e38337f7f313b1fac2ebb43a5d96c561bc35165f939a84cc46c9520e608eb6c1a5005d9075916e080193f643e2eeacf62278fab90158a68b277706129ad3acb9e319e33ee
+  ROBINHOOD_CHAIN_ID: 4663
+  ROBINHOOD_RPC_URL: https://rpc.mainnet.chain.robinhood.com
+
+jobs:
+  verify:
+    name: Test, Typecheck & Migrate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: avyro_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Type check
+        run: bun run check
+
+      - name: Run database migrations
+        run: bun -e 'import { migrate } from "./src/db/migrate"; await migrate();'
+
+      - name: Run tests
+        run: bun test
