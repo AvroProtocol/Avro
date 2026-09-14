@@ -65,10 +65,9 @@ async function fetchGithubReleases(): Promise<ReleaseResponse[]> {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const reposToTry = [
-    `${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}`,
-    ...(ACTIONS_REPO_OWNER !== GITHUB_REPO_OWNER ? [`${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}`] : []),
-  ];
+  const actionsRepo = `${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}`;
+  const publicRepo = `${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}`;
+  const reposToTry = actionsRepo === publicRepo ? [actionsRepo] : [actionsRepo, publicRepo];
 
   const allReleases: ReleaseResponse[] = [];
 
@@ -129,7 +128,7 @@ function findLatestDesktopRelease(releases: ReleaseResponse[]): ReleaseResponse 
       return rel;
     }
   }
-  return releases[0] || null;
+  return null;
 }
 
 /**
@@ -145,10 +144,9 @@ async function fetchLatestArtifact(platformName: string): Promise<ArtifactMatch 
     "User-Agent": "Avyro-Backend",
   };
 
-  const reposToTry = [
-    `${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}`,
-    ...(ACTIONS_REPO_OWNER !== GITHUB_REPO_OWNER ? [`${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}`] : []),
-  ];
+  const actionsRepo = `${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}`;
+  const publicRepo = `${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}`;
+  const reposToTry = actionsRepo === publicRepo ? [actionsRepo] : [actionsRepo, publicRepo];
 
   const p = platformName.toLowerCase();
 
@@ -410,20 +408,22 @@ downloadsRouter.get("/v1/downloads/mobile", (_req: Request, res: ExpressResponse
   res.redirect(307, "/v1/downloads/mobile/latest");
 });
 
+const FALLBACK_APP_RELEASE_TAG = process.env.APP_RELEASE_TAG?.trim() || "v0.1.14";
+const FALLBACK_APP_VERSION = FALLBACK_APP_RELEASE_TAG.replace(/^v/, "");
+const RELEASE_BASE = `https://github.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/releases/download/${FALLBACK_APP_RELEASE_TAG}`;
+
 const FALLBACK_DIRECT_URLS: Record<string, string> = {
-  windows: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_x64-setup.exe`,
-  win: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_x64-setup.exe`,
-  exe: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_x64-setup.exe`,
-  msi: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_x64-setup.exe`,
-  macos: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_aarch64.app.tar.gz`,
-  mac: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_aarch64.app.tar.gz`,
-  darwin: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_aarch64.app.tar.gz`,
-  dmg: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_aarch64.app.tar.gz`,
-  linux: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_amd64.deb`,
-  deb: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_amd64.deb`,
-  appimage: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/latest/download/AVYRO_0.1.0_amd64.deb`,
-  android: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/download/v0.1.13/avyro-mobile.apk`,
-  apk: `https://github.com/${ACTIONS_REPO_OWNER}/${ACTIONS_REPO_NAME}/releases/download/v0.1.13/avyro-mobile.apk`,
+  windows: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_x64-setup.exe`,
+  win: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_x64-setup.exe`,
+  exe: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_x64-setup.exe`,
+  msi: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_x64_en-US.msi`,
+  macos: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_aarch64.dmg`,
+  mac: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_aarch64.dmg`,
+  darwin: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_aarch64.dmg`,
+  dmg: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_aarch64.dmg`,
+  linux: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_amd64.AppImage`,
+  deb: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_amd64.deb`,
+  appimage: `${RELEASE_BASE}/Avyro.Protocol_${FALLBACK_APP_VERSION}_amd64.AppImage`,
 };
 
 // Aliases for mobile download routes
@@ -528,6 +528,15 @@ downloadsRouter.get("/v1/downloads/:platform", async (req: Request, res: Express
     const fallbackUrl = FALLBACK_DIRECT_URLS[rawPlatform];
     if (fallbackUrl) {
       res.redirect(302, fallbackUrl);
+      return;
+    }
+
+    if (rawPlatform === "android" || rawPlatform === "apk") {
+      res.status(503).json({
+        error: "Android APK is being prepared for the current AVYRO release.",
+        code: "APK_RELEASE_PENDING",
+        releases: `https://github.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/releases`,
+      });
       return;
     }
 

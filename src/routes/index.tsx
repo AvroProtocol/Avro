@@ -230,8 +230,29 @@ function AvyroLandingPage() {
               <QuorumEngine />
             </div>
           </div>
-          <a className="nx-scroll-cue" href="#product"><span>SCROLL TO EXPLORE</span><ArrowDown size={14} /></a>
+          <a className="nx-scroll-cue" href="#download"><span>DOWNLOAD AVYRO</span><ArrowDown size={14} /></a>
           <div className="nx-hero-marquee" aria-hidden="true"><div>{Array.from({ length: 2 }).flatMap(() => ["THRESHOLD SECURITY", "PRIVATE PAYMENTS", "PASSKEY RECOVERY", "STEALTH RECEIVE", "OPEN SDK", "SMART ACCOUNTS"]).map((item, i) => <span key={i}>{item}<b>✦</b></span>)}</div></div>
+        </section>
+
+        <section className="nx-quick-downloads" id="download">
+          <div className="nx-container nx-quick-download-panel" data-reveal>
+            <div className="nx-quick-download-copy">
+              <span className="nx-index">GET AVYRO</span>
+              <h2>Choose your client.</h2>
+              <p>Install the native AVYRO client directly from the official release channel.</p>
+            </div>
+            <div className="nx-quick-download-grid">
+              <a href={ANDROID_DOWNLOAD_URL} className="nx-quick-download-card">
+                <span>01</span><Smartphone size={20}/><div><strong>Android APK</strong><small>Direct APK download</small></div><Download size={17}/>
+              </a>
+              <a href={DOWNLOADS[0][2]} className="nx-quick-download-card">
+                <span>02</span><TerminalSquare size={20}/><div><strong>Windows</strong><small>Windows 10 / 11 · x64</small></div><Download size={17}/>
+              </a>
+              <a href={DOWNLOADS[1][2]} className="nx-quick-download-card">
+                <span>03</span><Orbit size={20}/><div><strong>macOS</strong><small>Apple Silicon · macOS 11+</small></div><Download size={17}/>
+              </a>
+            </div>
+          </div>
         </section>
 
         <section className="nx-section nx-product" id="product">
