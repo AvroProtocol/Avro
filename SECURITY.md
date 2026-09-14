@@ -1,60 +1,59 @@
 # Security Policy
 
-AVYRO PROTOCOL is an open-source, self-custodial 2-of-3 threshold payment system built on **Robinhood Chain** (Chain ID: 4663). Because we protect user capital and private financial workflows, we treat security vulnerabilities with the highest priority.
+AVYRO is a self-custodial threshold wallet and payment stack. Security reports are handled privately because vulnerabilities may affect signing, recovery, account execution, or user funds.
 
-## Reporting a Vulnerability
+## Report a vulnerability
 
-**Do not file public GitHub issues for security vulnerabilities.**
+Do not open a public GitHub issue for a security vulnerability.
 
-Please report security issues directly to our security team:
-- **Email:** `security@avyroprotocol.com`
-- **PGP Key:** Available upon request or via published keybase profile.
+Email: `security@avyroprotocol.com`
 
-### What to Include
-1. A descriptive title and vulnerability severity rating.
-2. Detailed steps to reproduce (proof-of-concept scripts or forge test cases preferred).
-3. The component affected (`contracts/`, `backend/`, `sdk/`, or `desktop/`).
-4. Potential attack scenarios and impact analysis.
+Please include:
 
-### Response Timelines
-- **Initial Acknowledgment:** Within 48 hours.
-- **Triage & Severity Assessment:** Within 72 hours.
-- **Critical Patch & Deployment:** Targeted within 7 calendar days.
+- a clear description of the issue
+- affected component and version
+- reproduction steps or proof of concept
+- expected impact
+- any suggested mitigation
 
-We will keep you informed of our progress throughout remediation.
+## Response targets
 
----
+- Initial acknowledgement: within 48 hours
+- Triage: within 72 hours
+- Critical remediation target: within 7 calendar days
 
-## Scope & Threat Model
+These are response targets, not guarantees. Complex protocol or dependency issues may require additional validation before disclosure.
 
-### In-Scope Components
-| Component | Surface | Primary Risk Vectors |
-|---|---|---|
-| **Smart Contracts (`contracts/`)** | `AvyroAccount.sol`, `AvyroFactory.sol` | Quorum bypass, signature malleability, ERC-4337 entry point reentrancy, unauthorized execution |
-| **Co-Signer Backend (`backend/`)** | Express + Bun Co-Signer API | Spending policy bypass, rate-limit circumvention, encrypted Shard B exposure, replay attacks |
-| **Open SDK (`sdk/`)** | `@avyro/protocol-sdk` | Cryptographic key leakage, weak randomness in ephemeral key generation |
-| **Desktop Client (`desktop/`)** | Tauri v2 (Rust Core + React) | OS Keychain credential leakage, memory extraction of Shard A |
+## In scope
 
-### Out of Scope
-- Denial of Service attacks on public RPC endpoints or third-party bundlers.
-- Attacks requiring physical possession of both the unlocked user device AND the user's biometric hardware passkey.
-- Social engineering, phishing, or user error.
+| Component | Examples |
+| --- | --- |
+| `contracts/` | quorum bypass, unauthorized execution, signature validation, account-abstraction issues |
+| `backend/` | policy bypass, replay, authentication, shard exposure, rate-limit bypass |
+| `sdk/` | key handling, signature construction, unsafe cryptographic behavior |
+| `desktop/` | local key storage, IPC boundaries, native credential handling |
+| `android/` | local key storage, recovery flows, deep links, application security boundaries |
 
----
+## Security model
 
-## Safe Harbor & Research Guidelines
+AVYRO requires a 2-of-3 authorization quorum across independent security factors. A valid design must not allow one factor to spend alone.
 
-We consider security research conducted under the following conditions to be authorized and in good faith:
-- You make a good-faith effort to avoid privacy violations, data destruction, and service disruption.
-- You do not exploit a vulnerability beyond what is necessary to prove the risk.
-- You give us reasonable time to remediate before disclosing details publicly.
+```text
+A  Device shard
+B  Policy co-signer
+C  Passkey recovery shard
 
-We will not pursue legal action against researchers who adhere to these guidelines.
+Valid quorum: A+B, A+C, or B+C where the recovery policy permits it
+```
 
----
+Changes that alter signing, recovery, account execution, or key storage should receive additional review.
 
-## Network & Contract Reference
+## Research guidelines
 
-- **Execution Network:** Robinhood Chain Mainnet (Chain ID: `4663`, Arbitrum Dedicated L2)
-- **ERC-4337 EntryPoint v0.6:** `0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789`
-- **Frontier Settlement Assets:** USDG (`0x2D734407B184FF66b26D0cf32168e65842820579`), Native ETH
+Good-faith research is welcome when it avoids unnecessary access to user data, service disruption, or movement of real funds. Please limit testing to what is required to demonstrate the issue and allow reasonable time for remediation before disclosure.
+
+## Network reference
+
+- Robinhood Chain
+- Chain ID `4663`
+- ERC-4337 smart-account execution
