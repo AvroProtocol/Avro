@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
-import { generateShardKey } from "../src/crypto";
+import { app } from "../src/app.js";
+import { generateShardKey } from "../src/crypto.js";
 
 describe("Wallets and Co-Signing API Flow", () => {
   const walletAccount = generateShardKey();

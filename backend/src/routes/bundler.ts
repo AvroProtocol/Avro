@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { createPublicClient, createWalletClient, defineChain, http, isHex, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { pool, query } from "../db/index";
+import { pool, query } from "../db/index.js";
 
 export const bundlerRouter = Router();
 

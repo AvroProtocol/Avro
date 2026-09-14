@@ -6,7 +6,7 @@ import {
   generateApiKey,
   hashApiKey,
   signUserOpHash,
-} from "../src/crypto";
+} from "../src/crypto.js";
 
 describe("Crypto & Vault Module", () => {
   it("encrypts and decrypts secrets accurately using AES-256-GCM", () => {

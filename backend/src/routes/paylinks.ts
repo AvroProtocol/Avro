@@ -1,10 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress, getAddress } from "viem";
 import { randomBytes } from "node:crypto";
-import { pool } from "../db/index";
-import { generateShardKey, encryptSecret } from "../crypto";
-import { checkAndSweepPaylink } from "../sweeper";
-import { AVYRO_TOKEN_ADDRESS } from "../poolWallet";
+import { pool } from "../db/index.js";
+import { generateShardKey, encryptSecret } from "../crypto.js";
+import { checkAndSweepPaylink } from "../sweeper.js";
+import { AVYRO_TOKEN_ADDRESS } from "../poolWallet.js";
 
 export const paylinksRouter = Router();
 

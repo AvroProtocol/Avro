@@ -1,7 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
-import { calculateStakingTier } from "../src/stakingTier";
+import { app } from "../src/app.js";
+import { calculateStakingTier } from "../src/stakingTier.js";
 
 describe("Staking Tier Model", () => {
   it("correctly identifies non-eligible stakes under 10,000 AVYRO", () => {

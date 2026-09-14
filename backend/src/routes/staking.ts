@@ -9,10 +9,10 @@ import {
   parseEther,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { pool, query } from "../db/index";
-import { hashApiKey } from "../crypto";
-import { calculateStakingTier } from "../stakingTier";
-import { robinhoodChain } from "./bundler";
+import { pool, query } from "../db/index.js";
+import { hashApiKey } from "../crypto.js";
+import { calculateStakingTier } from "../stakingTier.js";
+import { robinhoodChain } from "./bundler.js";
 import {
   ERC20_ABI,
   POOL_ADDRESS,
@@ -21,8 +21,8 @@ import {
   getPoolAvyrBalance,
   getPoolWalletClient,
   getPublicClient,
-} from "../poolWallet";
-import { avyrDecimalToWei } from "../treasury";
+} from "../poolWallet.js";
+import { avyrDecimalToWei } from "../treasury.js";
 
 export const stakingRouter = Router();
 

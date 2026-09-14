@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress, isHex } from "viem";
-import { query } from "../db/index";
-import { decryptSecret, hashApiKey, signUserOpHash } from "../crypto";
-import { getFreezeState } from "../freeze";
+import { query } from "../db/index.js";
+import { decryptSecret, hashApiKey, signUserOpHash } from "../crypto.js";
+import { getFreezeState } from "../freeze.js";
 
 export const cosignRouter = Router();
 

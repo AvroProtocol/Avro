@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
+import { app } from "../src/app.js";
 
 describe("Desktop Updates API", () => {
   test("returns update manifest when older version requests check", async () => {

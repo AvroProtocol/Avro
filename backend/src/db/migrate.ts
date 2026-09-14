@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { pool } from "./index";
+import { fileURLToPath } from "node:url";
+import { pool } from "./index.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function migrate() {
   const client = await pool.connect();
@@ -14,7 +17,7 @@ export async function migrate() {
     `);
 
     // 2. Read migration files
-    const migrationsDir = path.resolve(import.meta.dir, "../../db/migrations");
+    const migrationsDir = path.resolve(__dirname, "../../db/migrations");
     if (!fs.existsSync(migrationsDir)) {
       console.log("[db] No migrations directory found, skipping migrations.");
       return;

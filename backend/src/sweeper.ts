@@ -8,8 +8,8 @@ import {
   type Hex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { pool } from "./db/index";
-import { decryptSecret } from "./crypto";
+import { pool } from "./db/index.js";
+import { decryptSecret } from "./crypto.js";
 import {
   POOL_ADDRESS,
   RPC_URL,
@@ -17,7 +17,7 @@ import {
   ERC20_ABI,
   getPublicClient,
   loadPoolAccount,
-} from "./poolWallet";
+} from "./poolWallet.js";
 
 const NATIVE_ETH = "0x0000000000000000000000000000000000000000";
 

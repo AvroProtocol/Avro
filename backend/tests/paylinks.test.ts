@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
+import { app } from "../src/app.js";
 
 describe("Disposable Payment Links API", () => {
   const testRecipient = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";

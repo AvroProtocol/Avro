@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress } from "viem";
-import { pool, query } from "../db/index";
+import { pool, query } from "../db/index.js";
 import {
   APP_FEE_BPS,
   BRIDGE_CHAIN_IDS,
@@ -19,8 +19,8 @@ import {
   isBridgeChainId,
   microsToAvyrWei,
   microsToUsd,
-} from "../relay";
-import { getTreasuryStatus, processPendingPayouts } from "../treasury";
+} from "../relay.js";
+import { getTreasuryStatus, processPendingPayouts } from "../treasury.js";
 
 export const bridgeRouter = Router();
 

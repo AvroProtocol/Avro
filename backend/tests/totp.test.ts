@@ -5,7 +5,7 @@ import {
   buildOtpAuthUri,
   generateTotpSecret,
   verifyTotp,
-} from "../src/totp";
+} from "../src/totp.js";
 
 describe("TOTP Module", () => {
   it("encodes and decodes buffers in Base32 (RFC 4648)", () => {

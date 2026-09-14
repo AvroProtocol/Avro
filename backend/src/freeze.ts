@@ -1,6 +1,6 @@
-import { query } from "./db/index";
-import { decryptSecret } from "./crypto";
-import { base32Decode, verifyTotp } from "./totp";
+import { query } from "./db/index.js";
+import { decryptSecret } from "./crypto.js";
+import { base32Decode, verifyTotp } from "./totp.js";
 
 /**
  * Panic Freeze.

@@ -1,8 +1,8 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
-import { avyrDecimalToWei } from "../src/treasury";
-import { AVYRO_TOKEN_ADDRESS, POOL_ADDRESS, assertAvyrTokenConfigured } from "../src/poolWallet";
+import { app } from "../src/app.js";
+import { avyrDecimalToWei } from "../src/treasury.js";
+import { AVYRO_TOKEN_ADDRESS, POOL_ADDRESS, assertAvyrTokenConfigured } from "../src/poolWallet.js";
 import {
   deviationBps,
   calculateRebateMicros,
@@ -11,7 +11,7 @@ import {
   microsToUsd,
   usdToMicros,
   type RelayQuoteResponse,
-} from "../src/relay";
+} from "../src/relay.js";
 
 describe("Bridge rebate math", () => {
   it("parses decimal USD into exact micro-USD", () => {

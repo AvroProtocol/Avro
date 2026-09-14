@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { app } from "./app";
-import { migrate } from "./db/migrate";
+import { app } from "./app.js";
+import { migrate } from "./db/migrate.js";
 
 const PORT = Number(process.env.PORT) || 3001;
 

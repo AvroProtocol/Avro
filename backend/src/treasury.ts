@@ -1,5 +1,5 @@
 import { encodeFunctionData, isAddress, type Address } from "viem";
-import { pool } from "./db/index";
+import { pool } from "./db/index.js";
 import {
   ERC20_ABI,
   POOL_ADDRESS,
@@ -8,8 +8,8 @@ import {
   getPoolWalletClient,
   getPublicClient,
   loadPoolAccount,
-} from "./poolWallet";
-import { SETTLEMENT_CHAIN_ID } from "./relay";
+} from "./poolWallet.js";
+import { SETTLEMENT_CHAIN_ID } from "./relay.js";
 
 /**
  * Bridge rebate payouts, settled from the platform pool wallet.

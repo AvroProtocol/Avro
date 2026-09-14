@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
+import { app } from "../src/app.js";
 
 describe("Downloads API Endpoints", () => {
   it("returns latest download metadata with platform entries including android", async () => {

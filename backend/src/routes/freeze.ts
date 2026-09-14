@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress } from "viem";
-import { query } from "../db/index";
-import { hashApiKey } from "../crypto";
+import { query } from "../db/index.js";
+import { hashApiKey } from "../crypto.js";
 import {
   ATTEMPT_WINDOW_MINUTES,
   freezeWallet,
@@ -10,7 +10,7 @@ import {
   unfreezeWallet,
   verifyFreezeCode,
   type FreezeSource,
-} from "../freeze";
+} from "../freeze.js";
 
 export const freezeRouter = Router();
 

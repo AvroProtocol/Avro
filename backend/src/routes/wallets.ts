@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress } from "viem";
-import { query } from "../db/index";
-import { encryptSecret, generateApiKey, generateShardKey, hashApiKey } from "../crypto";
+import { query } from "../db/index.js";
+import { encryptSecret, generateApiKey, generateShardKey, hashApiKey } from "../crypto.js";
 
 export const walletsRouter = Router();
 

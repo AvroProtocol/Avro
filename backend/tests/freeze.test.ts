@@ -1,9 +1,9 @@
 import { describe, it, expect } from "bun:test";
 import request from "supertest";
-import { app } from "../src/app";
-import { generateShardKey } from "../src/crypto";
-import { base32Decode, generateTotpCode } from "../src/totp";
-import { MAX_FAILED_ATTEMPTS } from "../src/freeze";
+import { app } from "../src/app.js";
+import { generateShardKey } from "../src/crypto.js";
+import { base32Decode, generateTotpCode } from "../src/totp.js";
+import { MAX_FAILED_ATTEMPTS } from "../src/freeze.js";
 
 describe("Panic Freeze API", () => {
   const walletAccount = generateShardKey();

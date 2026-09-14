@@ -1,6 +1,6 @@
 import { createPublicClient, createWalletClient, http, type Address, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { decryptSecret } from "./crypto";
+import { decryptSecret } from "./crypto.js";
 
 /**
  * The platform pool wallet.

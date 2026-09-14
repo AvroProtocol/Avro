@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { isAddress, isHex } from "viem";
-import { query } from "../db/index";
-import { decryptSecret, encryptSecret, hashApiKey, signUserOpHash } from "../crypto";
-import { base32Decode, base32Encode, buildOtpAuthUri, generateTotpSecret, verifyTotp } from "../totp";
+import { query } from "../db/index.js";
+import { decryptSecret, encryptSecret, hashApiKey, signUserOpHash } from "../crypto.js";
+import { base32Decode, base32Encode, buildOtpAuthUri, generateTotpSecret, verifyTotp } from "../totp.js";
 
 export const recoveryRouter = Router();
 
