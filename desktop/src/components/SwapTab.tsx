@@ -16,7 +16,8 @@ import { TOKENS, type TokenInfo, findToken } from "../lib/tokens";
 import { getBestSwapQuote, buildSwapBatchCalls, type SwapQuoteResult } from "../lib/swap";
 import { executeAccountBatch } from "../lib/execute";
 import { TokenPickerModal } from "./TokenPickerModal";
-import { AvyroWallet, robinhoodChain } from "@avyro/protocol-sdk";
+import { AvyroWallet } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "../lib/chain";
 
 interface SwapTabProps {
   client: PublicClient;

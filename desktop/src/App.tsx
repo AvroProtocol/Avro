@@ -144,7 +144,6 @@ import {
   AvyroWallet,
   LocalShard,
   RemoteCosigner,
-  robinhoodChain,
   USDG_ADDRESS,
   erc20Abi,
   DEFAULT_API_URL,
@@ -153,6 +152,7 @@ import {
   getStakingStatus,
   type StakingStatusResponse,
 } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "./lib/chain";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 
 /**

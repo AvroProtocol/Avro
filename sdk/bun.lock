@@ -5,7 +5,7 @@
     "": {
       "name": "@avyro/protocol-sdk",
       "dependencies": {
-        "viem": "^2.23.0",
+        "viem": "2.56.3",
       },
       "devDependencies": {
         "@types/node": "^22.13.4",

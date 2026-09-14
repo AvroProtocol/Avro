@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version tag (e.g. v0.1.1, v0.1.6, v0.1.9, v0.1.10, v0.1.11, v0.1.12, v0.1.13)'
+        description: 'Release version tag (e.g. v0.1.14)'
         required: true
-        default: 'v0.1.13'
+        default: 'v0.1.14'
       release_title:
         description: 'Release Title'
         required: false
@@ -125,13 +125,10 @@ jobs:
         run: |
           bun install
           bun run build
-          bun link
 
       - name: Install Desktop dependencies
         working-directory: ./desktop
-        run: |
-          bun install
-          bun link @avyro/protocol-sdk
+        run: bun install
 
       - name: Build Desktop frontend
         working-directory: ./desktop

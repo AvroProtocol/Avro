@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import QRCode from "qrcode";
 import { formatEther, formatUnits, type Hex, type Address, type PublicClient } from "viem";
-import { USDG_ADDRESS, erc20Abi, robinhoodChain } from "@avyro/protocol-sdk";
+import { USDG_ADDRESS, erc20Abi } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "../lib/chain";
 import {
   generateStealthMetaAddressFromSeed,
   checkAnnouncement,

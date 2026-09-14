@@ -9,10 +9,10 @@ import {
 } from "viem";
 import {
   AvyroWallet,
-  robinhoodChain,
   getUserOpHash,
   submitUserOp,
 } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "./chain";
 import { privateKeyToAccount } from "viem/accounts";
 import { timeStage, type CeremonyEvent, type CeremonyStageId } from "./thresholdCeremony";
 

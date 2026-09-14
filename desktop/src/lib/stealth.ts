@@ -1,3 +1,4 @@
+import { robinhoodChain } from "./chain";
 import { secp256k1 } from "@noble/curves/secp256k1.js";
 import {
   keccak256,
@@ -12,7 +13,7 @@ import {
   type PublicClient,
 } from "viem";
 import { publicKeyToAddress, privateKeyToAccount } from "viem/accounts";
-import { robinhoodChain } from "@avyro/protocol-sdk";
+
 
 export const ERC5564_ANNOUNCER = "0x55649E01B5Df198D18D95b5cc5051630cfD45564" as const;
 

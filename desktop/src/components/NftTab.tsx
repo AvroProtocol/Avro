@@ -10,7 +10,8 @@ import {
 import { isAddress, type Address, type PublicClient } from "viem";
 import { NftItem, buildNftTransferCall } from "../lib/nft";
 import { executeAccountCall } from "../lib/execute";
-import { AvyroWallet, robinhoodChain } from "@avyro/protocol-sdk";
+import { AvyroWallet } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "../lib/chain";
 
 interface NftTabProps {
   client: PublicClient;

@@ -19,7 +19,8 @@ import {
 import { TOKENS, type TokenInfo, findToken, USDG_ADDRESS } from "../lib/tokens";
 import { executeAccountCall } from "../lib/execute";
 import { TokenPickerModal } from "./TokenPickerModal";
-import { AvyroWallet, robinhoodChain } from "@avyro/protocol-sdk";
+import { AvyroWallet } from "@avyro/protocol-sdk";
+import { robinhoodChain } from "../lib/chain";
 
 interface CrossChainTabProps {
   client: PublicClient;
