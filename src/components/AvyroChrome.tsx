@@ -3,6 +3,7 @@ import { ArrowUpRight, Download, Github, Menu, X } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAvyroConfig } from "@/lib/avyro-config";
+import { avyroApiUrl } from "@/lib/api";
 
 function XIcon({ size = 16 }: { size?: number }) {
   return (
@@ -59,7 +60,7 @@ export function AvyroHeader() {
           {config.githubUrl && <a className="avx-icon avx-social" href={config.githubUrl} target="_blank" rel="noreferrer" aria-label="Avyro on GitHub"><Github size={16} /></a>}
           <LanguageToggle className="avx-language" />
           <ThemeToggle className="avx-theme" />
-          <a className="avx-download" href="https://github.com/AvyroProtocol/Avyro/releases" target="_blank" rel="noreferrer"><Download size={14} /><span>Desktop</span></a>
+          <a className="avx-download" href={avyroApiUrl("v1/downloads/windows")}><Download size={14} /><span>Desktop</span></a>
           <button className="avx-menu" type="button" onClick={() => setOpen(value => !value)} aria-expanded={open} aria-label="Toggle navigation">
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>

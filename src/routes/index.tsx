@@ -29,6 +29,7 @@ import {
 import { AvyroFooter, AvyroHeader } from "@/components/AvyroChrome";
 import { useAvyroConfig } from "@/lib/avyro-config";
 import { usePageReveal } from "@/lib/use-page-reveal";
+import { avyroApiUrl } from "@/lib/api";
 import "@/styles/avyro-site.css";
 
 export const Route = createFileRoute("/")({
@@ -44,12 +45,13 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-const RELEASES_URL = "https://github.com/AvyroProtocol/Avyro/releases";
 const DOWNLOADS = [
-  ["Windows", "Windows 10 / 11 · x64", RELEASES_URL],
-  ["macOS", "macOS 11+ · Apple Silicon", RELEASES_URL],
-  ["Linux", "Debian / AppImage", RELEASES_URL],
+  ["Windows", "Windows 10 / 11 · x64", avyroApiUrl("v1/downloads/windows")],
+  ["macOS", "macOS 11+ · Apple Silicon", avyroApiUrl("v1/downloads/macos")],
+  ["Linux", "Debian / AppImage", avyroApiUrl("v1/downloads/linux")],
 ] as const;
+
+const ANDROID_DOWNLOAD_URL = avyroApiUrl("v1/downloads/android");
 
 const ROADMAP = [
   ["01", "LIVE", "Threshold custody", "ERC-4337 accounts, 2-of-3 key sharding, passkey recovery, desktop and mobile clients."],
@@ -350,7 +352,7 @@ function AvyroLandingPage() {
               <div className="nx-mobile-feature-list">
                 {MOBILE_FEATURES.map(([Icon, title, copy]) => <article key={title}><Icon size={18}/><div><b>{title}</b><span>{copy}</span></div></article>)}
               </div>
-              <div className="nx-mobile-home-actions"><a className="nx-button nx-button-light" href={RELEASES_URL}><Download size={15}/> Download Android</a><a className="nx-button nx-button-outline-dark" href="#security">Security model <ArrowRight size={15}/></a></div>
+              <div className="nx-mobile-home-actions"><a className="nx-button nx-button-light" href={ANDROID_DOWNLOAD_URL}><Download size={15}/> Download Android</a><a className="nx-button nx-button-outline-dark" href="#security">Security model <ArrowRight size={15}/></a></div>
             </div>
             <div className="nx-mobile-device-stage" data-reveal aria-label="Avyro mobile wallet preview">
               <div className="nx-mobile-orbit nx-mobile-orbit-a"/><div className="nx-mobile-orbit nx-mobile-orbit-b"/>

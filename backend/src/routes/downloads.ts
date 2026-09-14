@@ -2,12 +2,12 @@ import { Router, type Request, type Response as ExpressResponse } from "express"
 
 export const downloadsRouter = Router();
 
-const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER || "Avyro";
-const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME || "avyro";
+const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER || "AvyroProtocol";
+const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME || "Avyro";
 
 // Primary actions repository where GitHub Actions runs execute and build artifacts are stored
-const ACTIONS_REPO_OWNER = process.env.ACTIONS_REPO_OWNER || "NotADeveloper7";
-const ACTIONS_REPO_NAME = process.env.ACTIONS_REPO_NAME || "avyro";
+const ACTIONS_REPO_OWNER = process.env.ACTIONS_REPO_OWNER || "AvyroProtocol";
+const ACTIONS_REPO_NAME = process.env.ACTIONS_REPO_NAME || "Avyro";
 
 function getGitToken(): string {
   return (process.env.GIT_TOKEN || process.env.GITHUB_TOKEN || "").trim();
@@ -53,7 +53,7 @@ interface ArtifactMatch {
 
 /**
  * Fetch releases from GitHub API across repositories:
- * checks ACTIONS_REPO (NotADeveloper7) first, then public GITHUB_REPO (Avyro).
+ * checks the configured Actions repository first, then the public Avyro repository.
  */
 async function fetchGithubReleases(): Promise<ReleaseResponse[]> {
   const token = getGitToken();

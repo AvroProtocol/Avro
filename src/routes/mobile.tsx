@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { AvyroFooter, AvyroHeader } from "@/components/AvyroChrome";
 import { usePageReveal } from "@/lib/use-page-reveal";
+import { avyroApiUrl } from "@/lib/api";
 import "@/styles/avyro-site.css";
 
 export const Route = createFileRoute("/mobile")({
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/mobile")({
   }),
 });
 
-const RELEASES_URL = "https://github.com/AvyroProtocol/Avyro/releases";
+const ANDROID_DOWNLOAD_URL = avyroApiUrl("v1/downloads/android");
 
 const FEATURES = [
   [Shield, "2-of-3 threshold security", "Device, policy co-signer, and recovery shard. Any two authorize. One never can."],
@@ -41,7 +42,7 @@ const FEATURES = [
 function MobilePage() {
   usePageReveal();
   const [release] = useState("Latest Android release");
-  const downloadUrl = RELEASES_URL;
+  const downloadUrl = ANDROID_DOWNLOAD_URL;
 
   return (
     <div className="av-site">
