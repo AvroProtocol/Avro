@@ -10,7 +10,7 @@ import type {
 } from "./types.js";
 
 /**
- * Cross-chain bridging via Relay (https://relay.link) with a AVYR rebate on the
+ * Cross-chain bridging via Relay (https://relay.link) with a AVYRO rebate on the
  * relayer spread.
  *
  * Relay splits its relayer fee into two parts:
@@ -33,10 +33,18 @@ export const BRIDGE_CHAIN_NAMES: Record<BridgeChainId, string> = {
   4663: "Robinhood Chain",
 };
 
-/** AVYR (Avyro), 18 decimals. Deployed on Robinhood Chain only. */
-export const AVYR_ADDRESS = "0xee2ddd7128c291b027712eca157b3ff31a55a05a" as const;
-export const AVYR_DECIMALS = 18;
-export const AVYR_SYMBOL = "AVYR";
+/** AVYRO (Avyro), 18 decimals. Deployed on Robinhood Chain only. */
+export let AVYRO_ADDRESS = "" as Address;
+export const AVYRO_DECIMALS = 18;
+export const AVYRO_SYMBOL = "AVYRO";
+
+/** Configure the verified deployed $AVYRO contract address for SDK consumers. */
+export function configureAvyroTokenAddress(address: Address) {
+  if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
+    throw new Error("Invalid $AVYRO contract address");
+  }
+  AVYRO_ADDRESS = address;
+}
 
 /** Share of the relayer spread returned to the bridging user, in basis points. */
 export const DEFAULT_REBATE_BPS = 2500; // 25%
@@ -96,7 +104,7 @@ export function calculateRebateMicros(spreadMicros: bigint, rebateBps = DEFAULT_
 }
 
 /**
- * Converts a micro-USD rebate into AVYR wei at a given AVYR/USD price.
+ * Converts a micro-USD rebate into AVYRO wei at a given AVYRO/USD price.
  *
  * `avyrUsdPrice` is a decimal string ("0.0184"). Returns 0 when the price is
  * unavailable or non-positive rather than dividing by zero - callers should
@@ -105,13 +113,13 @@ export function calculateRebateMicros(spreadMicros: bigint, rebateBps = DEFAULT_
 export function rebateMicrosToAvyrWei(rebateMicros: bigint, avyrUsdPrice: string | number): bigint {
   const priceMicros = usdToMicros(avyrUsdPrice);
   if (rebateMicros <= 0n || priceMicros <= 0n) return 0n;
-  return (rebateMicros * 10n ** BigInt(AVYR_DECIMALS)) / priceMicros;
+  return (rebateMicros * 10n ** BigInt(AVYRO_DECIMALS)) / priceMicros;
 }
 
 export function formatAvyr(weiAmount: bigint, displayDecimals = 4): string {
-  const base = 10n ** BigInt(AVYR_DECIMALS);
+  const base = 10n ** BigInt(AVYRO_DECIMALS);
   const whole = weiAmount / base;
-  const fraction = (weiAmount % base).toString().padStart(AVYR_DECIMALS, "0").slice(0, displayDecimals);
+  const fraction = (weiAmount % base).toString().padStart(AVYRO_DECIMALS, "0").slice(0, displayDecimals);
   return `${whole}.${fraction}`;
 }
 
@@ -182,7 +190,7 @@ export async function quoteBridgeWithRebate(
     spreadUsd: microsToUsd(spreadMicros),
     rebateUsd: microsToUsd(rebateMicros),
     rebateBps,
-    rebateCurrency: AVYR_SYMBOL,
+    rebateCurrency: AVYRO_SYMBOL,
     settlementChainId: ROBINHOOD_CHAIN_ID,
   };
 

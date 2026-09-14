@@ -31,7 +31,7 @@ AVYRO PROTOCOL uses [Bun](https://bun.sh) and [Foundry](https://getfoundry.sh).
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/AvyroProtocol/AvyroProtocol.git
+git clone https://github.com/AvyroProtocol/Avyro.git
 cd avyro-protocol
 
 # Install root dependencies (TanStack React web frontend)

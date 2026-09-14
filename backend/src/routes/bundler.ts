@@ -54,7 +54,7 @@ bundlerRouter.post("/v1/bundler/userop", async (req: Request, res: Response): Pr
 
       if (stakeCheck.rows.length === 0) {
         res.status(403).json({
-          error: "Gasless sponsorship requires active $AVYR staking. Stake in the Gasless tab to unlock free transactions.",
+          error: "Gasless sponsorship requires active $AVYRO staking. Stake in the Gasless tab to unlock free transactions.",
           code: "NOT_STAKED",
         });
         return;

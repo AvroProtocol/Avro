@@ -1,13 +1,13 @@
 -- Unstake settlement tracking.
 --
 -- Before this, an UNSTAKE event recorded a synthetic tx_hash ("unstake-<ms>")
--- and no AVYR ever left the pool: the ledger said unstaked while the chain had
+-- and no AVYRO ever left the pool: the ledger said unstaked while the chain had
 -- not moved. Settlement is now tracked explicitly so an unstake that has not
 -- been paid out is visible rather than silently complete.
 
 ALTER TABLE staking_events
   -- pending  -> balance debited, transfer not yet broadcast
-  -- settled  -> AVYR transfer confirmed on-chain
+  -- settled  -> AVYRO transfer confirmed on-chain
   -- failed   -> transfer failed; the stake has been restored
   -- n/a      -> events that do not move funds (STAKE, RENEW)
   ADD COLUMN IF NOT EXISTS settlement_status VARCHAR(16) NOT NULL DEFAULT 'n/a',

@@ -137,7 +137,7 @@ export interface RecoveryOptions {
   nonce?: bigint;
 }
 
-/* ---------- Cross-chain bridging & AVYR rebates ---------- */
+/* ---------- Cross-chain bridging & AVYRO rebates ---------- */
 
 /** Chains Avyro bridges between (Ethereum, Base, Arbitrum, Robinhood Chain). */
 export type BridgeChainId = 1 | 8453 | 42161 | 4663;
@@ -211,9 +211,9 @@ export interface BridgeRebateEstimate {
   /** Rebate owed to the user, as a decimal USD string. */
   rebateUsd: string;
   rebateBps: number;
-  /** Rebates are always denominated for payout in AVYR. */
+  /** Rebates are always denominated for payout in AVYRO. */
   rebateCurrency: string;
-  /** AVYR only exists on Robinhood Chain, so rebates settle there. */
+  /** AVYRO only exists on Robinhood Chain, so rebates settle there. */
   settlementChainId: number;
 }
 

@@ -50,7 +50,7 @@ export const DEFAULT_ASSET_PRICES_USD: Record<string, number> = {
   USDT: 1.0,
   ETH: 2500.0,
   WETH: 2500.0,
-  AVYR: 0.005,
+  AVYRO: 0.005,
 };
 
 export function estimateUsdValue(

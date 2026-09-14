@@ -20,7 +20,7 @@ The source pack includes the animated public website, Tauri desktop client, Reac
 
 | Surface | Purpose |
 |---|---|
-| **Avyro Web** | Public product site, interactive custody demos, downloads, docs, mobile page, and the dedicated `$AVYR` page |
+| **Avyro Web** | Public product site, interactive custody demos, downloads, docs, mobile page, and the dedicated `$AVYRO` page |
 | **Avyro Desktop** | Native wallet for Windows, macOS, and Linux with threshold signing, swaps, bridge flows, privacy, pay links, guardrails, and recovery |
 | **Avyro Mobile** | Android companion wallet for payments, contacts, pay links, recovery, and security controls |
 | **Avyro SDK** | Typed Viem-based wallet, account, bridge, staking, pay-link, recovery, and guardrail primitives |
@@ -43,7 +43,7 @@ The co-signer cannot spend funds by itself. The account contract validates a thr
 
 The web experience has been rebuilt around a black/white design system with a persistent light/dark toggle, responsive navigation, pointer parallax, reveal motion, animated threshold diagrams, interactive custody controls, privacy visualizations, roadmap motion, mobile-first layouts, and reduced-motion accessibility support.
 
-The public token route is `/avyro`. Its ticker, contract address, buy destination, X profile, and GitHub URL are read at runtime from `public/config.json`. The source pack ships with the currently configured settlement-token contract so staking, pay links, rebates, and the token page use one canonical address. Replace that address in the AVYR configuration when a new contract is deployed.
+The public token route is `/avyro`. Its ticker, contract address, buy destination, X profile, and GitHub URL are read at runtime from `public/config.json`. The repository ships with the public contract address intentionally blank. When the final `$AVYRO` contract is deployed, set `contractAddress` once in `public/config.json`. The website updates the displayed CA, copy action, launch state, and Pons buy URL automatically. The buy URL template is `https://www.ponsfamily.com/launchpad/{ca}`.
 
 ## Repository structure
 
@@ -126,7 +126,7 @@ All clients now use Avyro-only identifiers and endpoints. The default API origin
 - Web: `VITE_BACKEND_URL` or `VITE_API_URL`
 - Android: `EXPO_PUBLIC_AVYRO_API_URL`
 - SDK/desktop: pass `apiUrl` when creating a wallet or co-signer client
-- Backend token settings: `AVYR_TOKEN_ADDRESS`, `AVYR_USD_REFERENCE_PRICE`, `AVYR_PRICE_MAX_DEVIATION_BPS`, and `AVYR_USD_PRICE`
+- Backend token settings: `AVYRO_TOKEN_ADDRESS`, `AVYRO_USD_REFERENCE_PRICE`, `AVYRO_PRICE_MAX_DEVIATION_BPS`, and `AVYRO_USD_PRICE`
 
 For an existing database, migration `008_avyr_rebate_columns.sql` upgrades the rebate ledger column names automatically.
 

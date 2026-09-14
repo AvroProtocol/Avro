@@ -1,6 +1,6 @@
 -- Payout broadcasting for bridge rebates, plus the price-guard audit trail.
 --
--- AVYR has thin liquidity (~$4.8k), which makes spot price cheap to move. A
+-- AVYRO has thin liquidity (~$4.8k), which makes spot price cheap to move. A
 -- claim is therefore priced against a reference, and the figures behind that
 -- decision are recorded so a disputed payout can be reconstructed.
 

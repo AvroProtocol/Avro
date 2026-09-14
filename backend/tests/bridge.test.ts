@@ -2,7 +2,7 @@ import { describe, it, expect } from "bun:test";
 import request from "supertest";
 import { app } from "../src/app";
 import { avyrDecimalToWei } from "../src/treasury";
-import { AVYR_TOKEN_ADDRESS, POOL_ADDRESS, assertAvyrTokenConfigured } from "../src/poolWallet";
+import { AVYRO_TOKEN_ADDRESS, POOL_ADDRESS, assertAvyrTokenConfigured } from "../src/poolWallet";
 import {
   deviationBps,
   calculateRebateMicros,
@@ -73,12 +73,12 @@ describe("Bridge rebate math", () => {
     expect(calculateRebateMicros(100_000n, 0)).toBe(0n);
   });
 
-  it("converts a USD rebate into AVYR wei at the given price", () => {
-    // $0.25 of rebate at $0.05/AVYR = 5 AVYR
+  it("converts a USD rebate into AVYRO wei at the given price", () => {
+    // $0.25 of rebate at $0.05/AVYRO = 5 AVYRO
     expect(microsToAvyrWei(250_000n, "0.05")).toBe(5n * 10n ** 18n);
   });
 
-  it("returns zero AVYR when the price is missing or zero", () => {
+  it("returns zero AVYRO when the price is missing or zero", () => {
     expect(microsToAvyrWei(250_000n, "0")).toBe(0n);
     expect(microsToAvyrWei(250_000n, "")).toBe(0n);
   });
@@ -93,8 +93,8 @@ describe("Bridge API", () => {
     expect(ids).toEqual([1, 4663, 8453, 42161]);
     expect(res.body.rebateBps).toBe(2500);
     expect(res.body.settlementChainId).toBe(4663);
-    expect(res.body.rebateCurrency.symbol).toBe("AVYR");
-    expect(res.body.rebateCurrency.address).toBe("0xee2ddd7128c291b027712eca157b3ff31a55a05a");
+    expect(res.body.rebateCurrency.symbol).toBe("AVYRO");
+    expect(res.body.rebateCurrency.address).toBe(AVYRO_TOKEN_ADDRESS);
   });
 
   it("rejects a quote with an invalid user address", async () => {
@@ -159,9 +159,9 @@ describe("Bridge API", () => {
     expect(res.body.code).toBe("MISSING_REQUEST_ID");
   });
 });
-describe("AVYR price guard", () => {
-  // AVYR has ~$4.8k of liquidity, so spot is cheap to move. A lower price pays
-  // out MORE AVYR per USD, so a claimant is incentivised to push it down.
+describe("AVYRO price guard", () => {
+  // AVYRO has ~$4.8k of liquidity, so spot is cheap to move. A lower price pays
+  // out MORE AVYRO per USD, so a claimant is incentivised to push it down.
   it("measures deviation from the reference in basis points", () => {
     expect(deviationBps(usdToMicros("0.0000200"), usdToMicros("0.0000200"))).toBe(0);
     // Half price = 5000bps away from reference.
@@ -174,7 +174,7 @@ describe("AVYR price guard", () => {
     expect(deviationBps(usdToMicros("0.02"), 0n)).toBe(0);
   });
 
-  it("pays more AVYR when the price is pushed down - the reason for the guard", () => {
+  it("pays more AVYRO when the price is pushed down - the reason for the guard", () => {
     const rebate = 250_000n; // $0.25
     const atReference = microsToAvyrWei(rebate, "0.000020");
     const atHalfPrice = microsToAvyrWei(rebate, "0.000010");
@@ -210,23 +210,27 @@ describe("Bridge treasury API", () => {
   });
 });
 describe("Pool wallet configuration", () => {
-  it("points AVYR at the AVYR contract, not USDG", () => {
-    // v0.1.7 defaulted this to 0x5fc5...d168, which is the USDG contract.
-    expect(AVYR_TOKEN_ADDRESS.toLowerCase()).toBe("0xee2ddd7128c291b027712eca157b3ff31a55a05a");
-    expect(AVYR_TOKEN_ADDRESS.toLowerCase()).not.toBe("0x5fc5360d0400a0fd4f2af552add042d716f1d168");
+  it("never aliases AVYRO to USDG", () => {
+    if (AVYRO_TOKEN_ADDRESS) {
+      expect(AVYRO_TOKEN_ADDRESS.toLowerCase()).not.toBe("0x5fc5360d0400a0fd4f2af552add042d716f1d168");
+    }
   });
 
   it("uses the platform pool wallet as the settlement address", () => {
     expect(POOL_ADDRESS.toLowerCase()).toBe("0xf5370a080a8c8eed95e71982b228a3c0bdeff41f");
   });
 
-  it("accepts the configured AVYR token", () => {
-    expect(() => assertAvyrTokenConfigured()).not.toThrow();
+  it("requires a verified configured AVYRO token before token operations", () => {
+    if (AVYRO_TOKEN_ADDRESS) {
+      expect(() => assertAvyrTokenConfigured()).not.toThrow();
+    } else {
+      expect(() => assertAvyrTokenConfigured()).toThrow(/not configured/i);
+    }
   });
 });
 
 describe("Staking reserve accounting", () => {
-  it("scales decimal AVYR amounts to wei without floating point drift", () => {
+  it("scales decimal AVYRO amounts to wei without floating point drift", () => {
     expect(avyrDecimalToWei("1")).toBe(10n ** 18n);
     expect(avyrDecimalToWei("10000.5000")).toBe(10000n * 10n ** 18n + 5n * 10n ** 17n);
     expect(avyrDecimalToWei(0)).toBe(0n);
@@ -234,12 +238,12 @@ describe("Staking reserve accounting", () => {
   });
 
   it("does not lose precision on amounts that break Number", () => {
-    // 1,000,000 AVYR in wei exceeds Number.MAX_SAFE_INTEGER.
+    // 1,000,000 AVYRO in wei exceeds Number.MAX_SAFE_INTEGER.
     expect(avyrDecimalToWei("1000000")).toBe(1_000_000n * 10n ** 18n);
     expect(avyrDecimalToWei("1000000") > BigInt(Number.MAX_SAFE_INTEGER)).toBe(true);
   });
 
-  it("treats staked AVYR as a reserve rebates may not spend", () => {
+  it("treats staked AVYRO as a reserve rebates may not spend", () => {
     // The pool holds stake + surplus; only the surplus funds rebates.
     const balance = avyrDecimalToWei("150000");
     const stakedReserve = avyrDecimalToWei("120000");

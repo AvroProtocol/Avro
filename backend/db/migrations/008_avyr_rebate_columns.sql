@@ -1,4 +1,4 @@
--- Normalize rebate ledger columns to the AVYR naming used by the current source.
+-- Normalize rebate ledger columns to the AVYRO naming used by the current source.
 -- The migration is safe on both fresh databases and databases upgraded from an
 -- earlier schema: it checks for the historical columns before renaming them.
 DO $$

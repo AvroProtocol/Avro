@@ -7,8 +7,8 @@ import {
   BRIDGE_CHAIN_NAMES,
   MIN_CLAIM_MICROS,
   NATIVE_CURRENCY,
-  AVYR_ADDRESS,
-  AVYR_DECIMALS,
+  AVYRO_ADDRESS,
+  AVYRO_DECIMALS,
   REBATE_BPS,
   SETTLEMENT_CHAIN_ID,
   calculateRebateMicros,
@@ -29,7 +29,7 @@ export const bridgeRouter = Router();
  *
  * Users bridging between Ethereum, Base, Arbitrum and Robinhood Chain earn a
  * share of the Relay relayer spread. Rebates accrue in micro-USD and are paid
- * out in AVYR on Robinhood Chain, since AVYR exists only there.
+ * out in AVYRO on Robinhood Chain, since AVYRO exists only there.
  *
  * The fee figures behind an accrual always come from the quote this service
  * issued, so a client cannot inflate its own rebate.
@@ -40,7 +40,7 @@ bridgeRouter.get("/v1/bridge/chains", (_req: Request, res: Response) => {
   res.status(200).json({
     chains: BRIDGE_CHAIN_IDS.map((id) => ({ chainId: id, name: BRIDGE_CHAIN_NAMES[id] })),
     rebateBps: REBATE_BPS,
-    rebateCurrency: { symbol: "AVYR", address: AVYR_ADDRESS, decimals: AVYR_DECIMALS },
+    rebateCurrency: { symbol: "AVYRO", address: AVYRO_ADDRESS, decimals: AVYRO_DECIMALS },
     settlementChainId: SETTLEMENT_CHAIN_ID,
     minClaimUsd: microsToUsd(MIN_CLAIM_MICROS),
   });
@@ -145,7 +145,7 @@ bridgeRouter.post("/v1/bridge/quote", async (req: Request, res: Response): Promi
         spreadUsd: microsToUsd(spreadMicros),
         rebateUsd: microsToUsd(rebateMicros),
         rebateBps: REBATE_BPS,
-        rebateCurrency: "AVYR",
+        rebateCurrency: "AVYRO",
         settlementChainId: SETTLEMENT_CHAIN_ID,
         appFeeBps: APP_FEE_BPS,
       },
@@ -291,7 +291,7 @@ bridgeRouter.get("/v1/bridge/rebates/:address", async (req: Request, res: Respon
 /**
  * Claims all confirmed rebates for a wallet.
  *
- * Creates the ledger entry and attaches the accruals atomically, fixing the AVYR
+ * Creates the ledger entry and attaches the accruals atomically, fixing the AVYRO
  * amount at the current price. Broadcasting the payout is a separate, explicitly
  * funded step - this endpoint never moves funds itself.
  */
@@ -305,7 +305,7 @@ bridgeRouter.post("/v1/bridge/rebates/:address/claim", async (req: Request, res:
   const priced = await resolveAvyrPrice();
   if (priced.rejection || !(Number(priced.price) > 0)) {
     res.status(503).json({
-      error: priced.rejection || "AVYR price is unavailable, so a claim cannot be priced right now",
+      error: priced.rejection || "AVYRO price is unavailable, so a claim cannot be priced right now",
       code: "PRICE_UNAVAILABLE",
       spotPrice: priced.spotPrice,
       referencePrice: priced.referencePrice || null,
@@ -383,7 +383,7 @@ bridgeRouter.post("/v1/bridge/rebates/:address/claim", async (req: Request, res:
       avyrWei: avyrWei.toString(),
       avyrUsdPrice: avyrPrice,
       avyrPriceSource: priced.source,
-      avyrToken: { symbol: "AVYR", address: AVYR_ADDRESS, decimals: AVYR_DECIMALS },
+      avyrToken: { symbol: "AVYRO", address: AVYRO_ADDRESS, decimals: AVYRO_DECIMALS },
       settlementChainId: SETTLEMENT_CHAIN_ID,
       accrualCount: confirmed.rows.length,
       status: "pending",
@@ -435,7 +435,7 @@ bridgeRouter.get("/v1/bridge/claims/:address", async (req: Request, res: Respons
   }
 });
 /**
- * Treasury health: AVYR on hand versus AVYR already promised.
+ * Treasury health: AVYRO on hand versus AVYRO already promised.
  *
  * `underfunded` going true means claims have been priced that the treasury
  * cannot currently cover - worth alerting on.

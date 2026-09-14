@@ -4,7 +4,7 @@ import { app } from "../src/app";
 import { calculateStakingTier } from "../src/stakingTier";
 
 describe("Staking Tier Model", () => {
-  it("correctly identifies non-eligible stakes under 10,000 AVYR", () => {
+  it("correctly identifies non-eligible stakes under 10,000 AVYRO", () => {
     const t0 = calculateStakingTier(0);
     expect(t0.isEligible).toBe(false);
     expect(t0.monthlyQuota).toBe(0);
@@ -16,7 +16,7 @@ describe("Staking Tier Model", () => {
     expect(t9k.nextTierQuota).toBe(25);
   });
 
-  it("calculates Tier 1 for 10k to <50k AVYR (25 txns/month)", () => {
+  it("calculates Tier 1 for 10k to <50k AVYRO (25 txns/month)", () => {
     const t10k = calculateStakingTier(10000);
     expect(t10k.tierName).toBe("Tier 1");
     expect(t10k.monthlyQuota).toBe(25);
@@ -29,7 +29,7 @@ describe("Staking Tier Model", () => {
     expect(t40k.monthlyQuota).toBe(25);
   });
 
-  it("calculates Tier 2 for 50k AVYR (100 txns/month)", () => {
+  it("calculates Tier 2 for 50k AVYRO (100 txns/month)", () => {
     const t50k = calculateStakingTier(50000);
     expect(t50k.tierName).toBe("Tier 2");
     expect(t50k.monthlyQuota).toBe(100);
@@ -55,7 +55,7 @@ describe("Staking Tier Model", () => {
     expect(t200k.monthlyQuota).toBe(325);
   });
 
-  it("awards Unlimited transactions for >= 1,000,000 AVYR", () => {
+  it("awards Unlimited transactions for >= 1,000,000 AVYRO", () => {
     const t1m = calculateStakingTier(1000000);
     expect(t1m.tierName).toBe("Tier Unlimited");
     expect(t1m.monthlyQuota).toBe(-1);

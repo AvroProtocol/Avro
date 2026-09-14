@@ -23,7 +23,7 @@ import {
   checkAndSweepPayLink,
   DEFAULT_API_URL,
 } from "@avyro/protocol-sdk";
-import { AVYR_TOKEN_ADDRESS } from "../lib/tokens";
+import { AVYRO_TOKEN_ADDRESS, AVYRO_TOKEN_CONFIGURED } from "../lib/tokens";
 
 interface PayLinksTabProps {
   wallet: AvyroWallet;
@@ -49,7 +49,7 @@ export function PayLinksTab({ wallet, addToast, onBalanceRefresh }: PayLinksTabP
   const [qrCache, setQrCache] = useState<Record<string, string>>({});
 
   // Form states
-  const [tokenSymbol, setTokenSymbol] = useState<"USDG" | "ETH" | "AVYR">("USDG");
+  const [tokenSymbol, setTokenSymbol] = useState<"USDG" | "ETH" | "AVYRO">("USDG");
   const [amount, setAmount] = useState("");
   const [isFlexible, setIsFlexible] = useState(false);
   const [memo, setMemo] = useState("");
@@ -89,7 +89,7 @@ export function PayLinksTab({ wallet, addToast, onBalanceRefresh }: PayLinksTabP
     try {
       let tokenAddress = USDG_ADDRESS;
       if (tokenSymbol === "ETH") tokenAddress = NATIVE_ETH;
-      if (tokenSymbol === "AVYR") tokenAddress = AVYR_TOKEN_ADDRESS;
+      if (tokenSymbol === "AVYRO") tokenAddress = AVYRO_TOKEN_ADDRESS;
 
       const res = await createPayLink({
         recipient_address: wallet.address,
@@ -436,7 +436,7 @@ export function PayLinksTab({ wallet, addToast, onBalanceRefresh }: PayLinksTabP
                   Payment Asset
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {(["USDG", "ETH", "AVYR"] as const).map((sym) => (
+                  {(AVYRO_TOKEN_CONFIGURED ? (["USDG", "ETH", "AVYRO"] as const) : (["USDG", "ETH"] as const)).map((sym) => (
                     <button
                       key={sym}
                       type="button"

@@ -5,10 +5,10 @@ import type { AvyroWallet } from "./wallet.js";
 
 /**
  * Calculates staking tier and monthly transaction quota according to protocol rules:
- * - 10k AVYR: 25 txns/month
- * - 50k AVYR: 100 txns/month
+ * - 10k AVYRO: 25 txns/month
+ * - 50k AVYRO: 100 txns/month
  * - Every 50k increment above 50k: +75 txns/month
- * - 1M AVYR or more: Unlimited (-1)
+ * - 1M AVYRO or more: Unlimited (-1)
  */
 export function calculateStakingTier(stakedAmount: number) {
   if (stakedAmount >= 1_000_000) {
@@ -58,7 +58,7 @@ export async function getStakingStatus(
 }
 
 /**
- * Record a completed $AVYR stake transaction with the backend
+ * Record a completed $AVYRO stake transaction with the backend
  */
 export async function recordStake(params: {
   wallet: AvyroWallet;
@@ -109,7 +109,7 @@ export async function renewStaking(wallet: AvyroWallet): Promise<any> {
 }
 
 /**
- * Request unstaking of $AVYR back to user wallet
+ * Request unstaking of $AVYRO back to user wallet
  */
 export async function unstakeAvyr(params: {
   wallet: AvyroWallet;

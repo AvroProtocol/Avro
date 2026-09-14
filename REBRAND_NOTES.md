@@ -6,7 +6,7 @@ This source pack uses **AVYRO / Avyro Protocol** consistently across the public 
 
 - Master brand: **AVYRO**
 - Protocol and applications: **Avyro Protocol**
-- Ecosystem ticker: **$AVYR**
+- Ecosystem ticker: **$AVYRO**
 - Website: responsive black/white interface with persistent light/dark theme switching, animated sections, interactive custody demos, mobile-first navigation, and reduced-motion accessibility
 - Token route: `/avyro`, driven by `public/config.json`
 - SDK namespace: `@avyro/protocol-sdk`
@@ -33,25 +33,25 @@ EXPO_PUBLIC_AVYRO_API_URL=https://api.avyroprotocol.com
 
 The SDK and desktop wallet also accept an explicit `apiUrl` when a client is created.
 
-## AVYR configuration
+## AVYRO configuration
 
-The public token page reads `public/config.json`. Backend staking, bridge rebates, pay links, treasury accounting, SDK helpers, and desktop token metadata use the AVYR naming and the same configured contract address.
+The public token page reads `public/config.json`. The public contract address is intentionally blank until the final `$AVYRO` deployment. The website treats `public/config.json` as the canonical runtime source for the ticker, CA, launch URL template, X profile, and GitHub repository.
 
 Backend environment variables:
 
 ```text
-AVYR_TOKEN_ADDRESS=
-AVYR_USD_REFERENCE_PRICE=
-AVYR_PRICE_MAX_DEVIATION_BPS=2000
-AVYR_USD_PRICE=
+AVYRO_TOKEN_ADDRESS=
+AVYRO_USD_REFERENCE_PRICE=
+AVYRO_PRICE_MAX_DEVIATION_BPS=2000
+AVYRO_USD_PRICE=
 ```
 
-When changing the AVYR contract, update the backend environment and the public/desktop/SDK token configuration together so every surface resolves the same asset.
+For the website, set `contractAddress` in `public/config.json`; the displayed CA and `https://www.ponsfamily.com/launchpad/{ca}` buy URL update automatically. Backend token operations still require the production `AVYRO_TOKEN_ADDRESS` environment variable, and native clients should be built against the verified production token address.
 
 ## Database upgrade
 
-Fresh installs create AVYR-named rebate ledger columns directly. Existing databases are upgraded by `backend/db/migrations/008_avyr_rebate_columns.sql`, which safely renames the historical rebate columns when present.
+Fresh installs create AVYRO-named rebate ledger columns directly. Existing databases are upgraded by `backend/db/migrations/008_avyr_rebate_columns.sql`, which safely renames the historical rebate columns when present.
 
 ## Distribution
 
-The default social destinations are `x.com/AvyroProtocol` and `github.com/AvyroProtocol/AvyroProtocol`. Confirm those values before production deployment.
+The default social destinations are `x.com/AvyroProtocol` and `github.com/AvyroProtocol/Avyro`.

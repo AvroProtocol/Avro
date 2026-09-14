@@ -1681,3 +1681,4 @@ html[data-theme] .mobile-nav-panel a[aria-label="npm SDK Package"] {
 html[data-theme] [style*="#cb3837"] {
   background: var(--avyro-surface) !important;
 }
+.pv-docs-home-note{max-width:210px;margin:8px 0 18px;color:#8a91a0;font-size:11px;line-height:1.45}.pv-docs-nav a[data-home-section="true"]:after{content:"↗";float:right;color:#a0a6b2;font-size:11px}.pv-docs-nav a[data-home-section="true"]:hover:after{color:#0e121b}

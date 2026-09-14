@@ -16,21 +16,21 @@ const PLATFORM_RELEASES: Record<string, PlatformRelease> = {
     version: "0.1.11",
     pubDate: "2026-09-12T12:00:00Z",
     notes: "v0.1.11: Panic Freeze: stop the co-signer from signing anything, from any phone, with your authenticator code.",
-    downloadUrl: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_amd64.AppImage",
+    downloadUrl: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_amd64.AppImage",
     mandatory: false,
   },
   "darwin-arm64": {
     version: "0.1.11",
     pubDate: "2026-09-12T12:00:00Z",
     notes: "v0.1.11: Panic Freeze: stop the co-signer from signing anything, from any phone, with your authenticator code.",
-    downloadUrl: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_aarch64.dmg",
+    downloadUrl: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_aarch64.dmg",
     mandatory: false,
   },
   "windows-x86_64": {
     version: "0.1.11",
     pubDate: "2026-09-12T12:00:00Z",
     notes: "v0.1.11: Panic Freeze: stop the co-signer from signing anything, from any phone, with your authenticator code.",
-    downloadUrl: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_x64-setup.exe",
+    downloadUrl: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_x64-setup.exe",
     mandatory: false,
   },
 };
@@ -78,13 +78,13 @@ updatesRouter.get("/v1/updates/desktop/latest.json", (_req: Request, res: Respon
     notes: "v0.1.11: Panic Freeze: stop the co-signer from signing anything, from any phone, with your authenticator code.",
     platforms: {
       "linux-x86_64": {
-        url: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_amd64.AppImage",
+        url: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_amd64.AppImage",
       },
       "darwin-aarch64": {
-        url: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_aarch64.dmg",
+        url: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_aarch64.dmg",
       },
       "windows-x86_64": {
-        url: "https://github.com/AvyroProtocol/AvyroProtocol/releases/download/v0.1.11/AVYRO_0.1.11_x64-setup.exe",
+        url: "https://github.com/AvyroProtocol/Avyro/releases/download/v0.1.11/AVYRO_0.1.11_x64-setup.exe",
       },
     },
   });

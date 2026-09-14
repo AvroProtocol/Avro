@@ -16,7 +16,7 @@ describe("In-App Spending Guardrails", () => {
     expect(estimateUsdValue(100, "USDG")).toBe(100);
     expect(estimateUsdValue("50.5", "USDC")).toBe(50.5);
     expect(estimateUsdValue(0.1, "ETH")).toBe(250);
-    expect(estimateUsdValue(10000, "AVYR")).toBe(50);
+    expect(estimateUsdValue(10000, "AVYRO")).toBe(50);
     expect(estimateUsdValue(0, "ETH")).toBe(0);
     expect(estimateUsdValue(-5, "USDG")).toBe(0);
   });

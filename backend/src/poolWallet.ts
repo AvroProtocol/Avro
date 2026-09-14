@@ -5,9 +5,9 @@ import { decryptSecret } from "./crypto";
 /**
  * The platform pool wallet.
  *
- * One wallet backs both products: it custodies AVYR staked for gasless
+ * One wallet backs both products: it custodies AVYRO staked for gasless
  * transactions and pays ETH gas sponsorship, and from v0.1.8 it also settles
- * bridge rebates. Because staked AVYR is user property owed back on unstake,
+ * bridge rebates. Because staked AVYRO is user property owed back on unstake,
  * every spend path must respect the staking reserve - see `getPoolSolvency`.
  */
 
@@ -21,14 +21,12 @@ export const RPC_URL =
 
 export const CHAIN_ID = Number(process.env.ROBINHOOD_CHAIN_ID) || 4663;
 
-/** AVYR (Avyro), 18 decimals, Robinhood Chain. */
-export const AVYR_TOKEN_ADDRESS = (
-  process.env.AVYR_TOKEN_ADDRESS?.trim() || "0xee2ddd7128c291b027712eca157b3ff31a55a05a"
-) as Address;
+/** AVYRO (Avyro), 18 decimals, Robinhood Chain. */
+export const AVYRO_TOKEN_ADDRESS = (process.env.AVYRO_TOKEN_ADDRESS?.trim() || "") as Address;
 
-export const AVYR_DECIMALS = 18;
+export const AVYRO_DECIMALS = 18;
 
-/** USDG - not AVYR. Kept here so misconfiguration can be detected explicitly. */
+/** USDG - not AVYRO. Kept here so misconfiguration can be detected explicitly. */
 const USDG_ADDRESS = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
 
 export const ERC20_ABI = [
@@ -52,16 +50,19 @@ export const ERC20_ABI = [
 ] as const;
 
 /**
- * Guards against the AVYR token address being set to USDG.
+ * Guards against the AVYRO token address being set to USDG.
  *
  * These are different assets on the same chain, so a mix-up silently moves the
  * wrong token rather than failing - worth refusing at startup.
  */
 export function assertAvyrTokenConfigured(): void {
-  if (AVYR_TOKEN_ADDRESS.toLowerCase() === USDG_ADDRESS) {
+  if (!/^0x[0-9a-fA-F]{40}$/.test(AVYRO_TOKEN_ADDRESS)) {
     throw new Error(
-      "AVYR_TOKEN_ADDRESS is set to the USDG contract. AVYR is 0xee2ddd7128c291b027712eca157b3ff31a55a05a."
+      "AVYRO_TOKEN_ADDRESS is not configured. Set the verified deployed $AVYRO contract address before enabling token operations."
     );
+  }
+  if (AVYRO_TOKEN_ADDRESS.toLowerCase() === USDG_ADDRESS) {
+    throw new Error("AVYRO_TOKEN_ADDRESS must not be the USDG contract.");
   }
 }
 
@@ -125,10 +126,11 @@ export function getPoolWalletClient() {
   return { account, client: createWalletClient({ account, transport: http(RPC_URL) }) };
 }
 
-/** AVYR held by the pool, in wei. */
+/** AVYRO held by the pool, in wei. */
 export async function getPoolAvyrBalance(): Promise<bigint> {
+  assertAvyrTokenConfigured();
   const balance = await getPublicClient().readContract({
-    address: AVYR_TOKEN_ADDRESS,
+    address: AVYRO_TOKEN_ADDRESS,
     abi: ERC20_ABI,
     functionName: "balanceOf",
     args: [POOL_ADDRESS],

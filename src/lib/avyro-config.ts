@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type AvyroPublicConfig = {
   ticker: string;
@@ -9,23 +9,33 @@ export type AvyroPublicConfig = {
 };
 
 export const DEFAULT_AVYRO_CONFIG: AvyroPublicConfig = {
-  ticker: "AVYR",
-  contractAddress: "0xee2ddd7128c291b027712eca157b3ff31a55a05a",
-  buyUrl: "https://ponsfamily.com/launchpad/",
+  ticker: "AVYRO",
+  contractAddress: "",
+  buyUrl: "https://www.ponsfamily.com/launchpad/{ca}",
   xUrl: "https://x.com/AvyroProtocol",
-  githubUrl: "https://github.com/AvyroProtocol/AvyroProtocol",
+  githubUrl: "https://github.com/AvyroProtocol/Avyro",
 };
 
 function normalizeConfig(value: Partial<AvyroPublicConfig> | null | undefined): AvyroPublicConfig {
   return {
     ...DEFAULT_AVYRO_CONFIG,
     ...(value ?? {}),
-    ticker: (value?.ticker || DEFAULT_AVYRO_CONFIG.ticker).replace(/^\$/, "").trim() || "AVYR",
-    contractAddress: (value?.contractAddress || DEFAULT_AVYRO_CONFIG.contractAddress).trim(),
+    ticker: (value?.ticker || DEFAULT_AVYRO_CONFIG.ticker).replace(/^\$/, "").trim() || "AVYRO",
+    contractAddress: (value?.contractAddress ?? DEFAULT_AVYRO_CONFIG.contractAddress).trim(),
     buyUrl: (value?.buyUrl || DEFAULT_AVYRO_CONFIG.buyUrl).trim(),
     xUrl: (value?.xUrl || DEFAULT_AVYRO_CONFIG.xUrl).trim(),
     githubUrl: (value?.githubUrl || DEFAULT_AVYRO_CONFIG.githubUrl).trim(),
   };
+}
+
+export function resolveAvyroBuyUrl(template: string, contractAddress: string) {
+  const ca = contractAddress.trim();
+  if (!ca) return "";
+  const base = template.trim();
+  if (!base) return "";
+  return base.includes("{ca}")
+    ? base.replace(/\{ca\}/gi, encodeURIComponent(ca))
+    : `${base.replace(/\/$/, "")}/${encodeURIComponent(ca)}`;
 }
 
 export function useAvyroConfig() {
@@ -46,10 +56,19 @@ export function useAvyroConfig() {
         if (!cancelled) setLoaded(true);
       }
     };
+
     load();
     const refresh = window.setInterval(load, 60_000);
-    return () => { cancelled = true; window.clearInterval(refresh); };
+    return () => {
+      cancelled = true;
+      window.clearInterval(refresh);
+    };
   }, []);
 
-  return { config, loaded };
+  const buyUrl = useMemo(
+    () => resolveAvyroBuyUrl(config.buyUrl, config.contractAddress),
+    [config.buyUrl, config.contractAddress],
+  );
+
+  return { config, loaded, buyUrl };
 }

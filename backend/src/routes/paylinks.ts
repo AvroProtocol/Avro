@@ -4,13 +4,13 @@ import { randomBytes } from "node:crypto";
 import { pool } from "../db/index";
 import { generateShardKey, encryptSecret } from "../crypto";
 import { checkAndSweepPaylink } from "../sweeper";
-import { AVYR_TOKEN_ADDRESS } from "../poolWallet";
+import { AVYRO_TOKEN_ADDRESS } from "../poolWallet";
 
 export const paylinksRouter = Router();
 
 const DEFAULT_TOKEN = "0x5fc5360d0400a0fd4f2af552add042d716f1d168"; // USDG
 const NATIVE_ETH = "0x0000000000000000000000000000000000000000";
-const AVYR_TOKEN = AVYR_TOKEN_ADDRESS;
+const AVYRO_TOKEN = AVYRO_TOKEN_ADDRESS;
 
 function generateSlug(): string {
   // Clean alphanumeric slug like "pay_7f9c2d1b"
@@ -47,8 +47,8 @@ paylinksRouter.post("/create", async (req: Request, res: Response) => {
     let symbol = token_symbol || "USDG";
     if (cleanToken.toLowerCase() === NATIVE_ETH.toLowerCase()) {
       symbol = "ETH";
-    } else if (cleanToken.toLowerCase() === AVYR_TOKEN.toLowerCase()) {
-      symbol = "AVYR";
+    } else if (cleanToken.toLowerCase() === AVYRO_TOKEN.toLowerCase()) {
+      symbol = "AVYRO";
     }
 
     const expectedAmount = amount ? Number(amount) : null;

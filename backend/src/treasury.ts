@@ -3,7 +3,7 @@ import { pool } from "./db/index";
 import {
   ERC20_ABI,
   POOL_ADDRESS,
-  AVYR_TOKEN_ADDRESS,
+  AVYRO_TOKEN_ADDRESS,
   getPoolAvyrBalance,
   getPoolWalletClient,
   getPublicClient,
@@ -14,11 +14,11 @@ import { SETTLEMENT_CHAIN_ID } from "./relay";
 /**
  * Bridge rebate payouts, settled from the platform pool wallet.
  *
- * Rebates are paid from AVYR the pool already holds rather than by market-buying
- * per claim: AVYR has roughly $4.8k of on-chain liquidity, where a $1.3k buy
+ * Rebates are paid from AVYRO the pool already holds rather than by market-buying
+ * per claim: AVYRO has roughly $4.8k of on-chain liquidity, where a $1.3k buy
  * already costs ~14% in slippage.
  *
- * The pool also custodies AVYR staked for gasless transactions. That stake is
+ * The pool also custodies AVYRO staked for gasless transactions. That stake is
  * user property owed back on unstake, so it is treated as a reserve that rebate
  * payouts may never draw against - a payout is refused when it would breach it,
  * rather than quietly spending someone's staking principal.
@@ -27,7 +27,7 @@ import { SETTLEMENT_CHAIN_ID } from "./relay";
 /** Payouts stay simulated until this is exactly "true". */
 export const PAYOUTS_ENABLED = process.env.REBATE_PAYOUTS_ENABLED?.trim() === "true";
 
-/** Hard ceiling per claim, in AVYR wei. Bounds the blast radius of a mispriced claim. */
+/** Hard ceiling per claim, in AVYRO wei. Bounds the blast radius of a mispriced claim. */
 export const MAX_PAYOUT_WEI = BigInt(
   process.env.REBATE_MAX_PAYOUT_WEI || (10_000_000n * 10n ** 18n).toString()
 );
@@ -47,11 +47,11 @@ export interface PayoutResult {
 export interface PoolSolvency {
   address: string;
   chainId: number;
-  /** AVYR the pool currently holds. */
+  /** AVYRO the pool currently holds. */
   avyrBalanceWei: string | null;
-  /** AVYR owed back to stakers - untouchable by rebate payouts. */
+  /** AVYRO owed back to stakers - untouchable by rebate payouts. */
   stakedReserveWei: string;
-  /** AVYR promised to rebate claims not yet paid. */
+  /** AVYRO promised to rebate claims not yet paid. */
   pendingRebateWei: string;
   /** Balance minus stake reserve: what rebates may actually draw on. */
   availableForRebatesWei: string | null;
@@ -69,9 +69,9 @@ export interface TreasuryStatus extends PoolSolvency {
 }
 
 /**
- * AVYR owed back to stakers, in wei.
+ * AVYRO owed back to stakers, in wei.
  *
- * `staking_records.staked_amount` is a decimal AVYR quantity, so it is scaled to
+ * `staking_records.staked_amount` is a decimal AVYRO quantity, so it is scaled to
  * wei here. Only ACTIVE records are owed - UNSTAKED and EXPIRED are not.
  */
 export async function getStakedReserveWei(): Promise<{ wei: bigint; stakers: number }> {
@@ -83,7 +83,7 @@ export async function getStakedReserveWei(): Promise<{ wei: bigint; stakers: num
   return { wei: avyrDecimalToWei(decimal), stakers: result.rows[0].count };
 }
 
-/** Scales a decimal AVYR amount ("10000.5000") to wei without floating point. */
+/** Scales a decimal AVYRO amount ("10000.5000") to wei without floating point. */
 export function avyrDecimalToWei(amount: string | number): bigint {
   const text = String(amount ?? "0").trim();
   if (!/^-?\d*\.?\d*$/.test(text) || text === "" || text === ".") return 0n;
@@ -93,7 +93,7 @@ export function avyrDecimalToWei(amount: string | number): bigint {
   return negative ? -wei : wei;
 }
 
-/** AVYR already promised to rebate claims but not yet paid. */
+/** AVYRO already promised to rebate claims but not yet paid. */
 export async function getPendingRebateWei(): Promise<{ wei: bigint; claims: number }> {
   const result = await pool.query(
     `SELECT COALESCE(SUM(avyr_wei), 0)::TEXT AS total, COUNT(*)::INT AS count
@@ -109,7 +109,7 @@ export async function getPoolSolvency(): Promise<PoolSolvency> {
   try {
     balanceWei = await getPoolAvyrBalance();
   } catch (error) {
-    console.error("[treasury] Pool AVYR balance read failed:", error);
+    console.error("[treasury] Pool AVYRO balance read failed:", error);
   }
 
   const available = balanceWei === null ? null : balanceWei - staked.wei;
@@ -142,7 +142,7 @@ export async function getTreasuryStatus(): Promise<TreasuryStatus> {
     configured: solvency.avyrBalanceWei !== null,
     payoutsEnabled: PAYOUTS_ENABLED,
     signerAvailable,
-    avyrToken: AVYR_TOKEN_ADDRESS,
+    avyrToken: AVYRO_TOKEN_ADDRESS,
   };
 }
 
@@ -186,7 +186,7 @@ export async function processPendingPayouts(
   try {
     balanceWei = await getPoolAvyrBalance();
   } catch (error) {
-    throw new Error(`Could not read pool AVYR balance: ${(error as Error).message}`);
+    throw new Error(`Could not read pool AVYRO balance: ${(error as Error).message}`);
   }
 
   // Only the surplus above staked principal is spendable on rebates.
@@ -221,7 +221,7 @@ export async function processPendingPayouts(
     // reserve or simply revert for want of balance.
     if (avyrWei > spendable) {
       const error =
-        `Pool has ${balanceWei} AVYR wei with ${staked.wei} reserved for stakers; ` +
+        `Pool has ${balanceWei} AVYRO wei with ${staked.wei} reserved for stakers; ` +
         `${avyrWei} exceeds the ${spendable > 0n ? spendable : 0n} available for rebates`;
       await recordAttempt(claim.id, avyrWei, "failed", undefined, error);
       results.push({ claimId: claim.id, recipient, avyrWei: claim.avyr_wei, outcome: "skipped", error });
@@ -267,12 +267,12 @@ export async function processPendingPayouts(
       });
 
       // Simulate first: a revert here costs nothing and leaves no half-state.
-      await publicClient.call({ account: POOL_ADDRESS, to: AVYR_TOKEN_ADDRESS, data });
+      await publicClient.call({ account: POOL_ADDRESS, to: AVYRO_TOKEN_ADDRESS, data });
 
       const txHash = await signer!.client.sendTransaction({
         account: signer!.account,
         chain: null,
-        to: AVYR_TOKEN_ADDRESS,
+        to: AVYRO_TOKEN_ADDRESS,
         data,
       });
 

@@ -16,8 +16,8 @@ import { robinhoodChain } from "./bundler";
 import {
   ERC20_ABI,
   POOL_ADDRESS,
-  AVYR_DECIMALS,
-  AVYR_TOKEN_ADDRESS,
+  AVYRO_DECIMALS,
+  AVYRO_TOKEN_ADDRESS,
   getPoolAvyrBalance,
   getPoolWalletClient,
   getPublicClient,
@@ -29,7 +29,7 @@ export const stakingRouter = Router();
 const rpcUrl = process.env.ROBINHOOD_RPC_URL || "https://rpc.mainnet.chain.robinhood.com";
 const chainId = Number(process.env.ROBINHOOD_CHAIN_ID) || 4663;
 const poolPublicKey = POOL_ADDRESS;
-const avyrTokenAddress = AVYR_TOKEN_ADDRESS;
+const avyrTokenAddress = AVYRO_TOKEN_ADDRESS;
 
 const publicClient = createPublicClient({
   transport: http(rpcUrl),
@@ -135,7 +135,7 @@ async function authenticateWallet(req: Request, walletAddress: string): Promise<
   return result.rows[0].api_key_hash === apiKeyHash;
 }
 
-// 3. Record a Stake after User transfers $AVYR to Platform Pool
+// 3. Record a Stake after User transfers $AVYRO to Platform Pool
 stakingRouter.post("/v1/staking/stake", async (req: Request, res: Response): Promise<void> => {
   const { walletAddress, txHash, amount } = req.body;
 
@@ -147,7 +147,7 @@ stakingRouter.post("/v1/staking/stake", async (req: Request, res: Response): Pro
   const numAmount = parseFloat(amount);
   if (isNaN(numAmount) || numAmount < 10000) {
     res.status(400).json({
-      error: "Minimum stake is 10,000 $AVYR to activate gasless transactions",
+      error: "Minimum stake is 10,000 $AVYRO to activate gasless transactions",
       code: "BELOW_MINIMUM_STAKE",
     });
     return;
@@ -276,7 +276,7 @@ stakingRouter.post("/v1/staking/renew", async (req: Request, res: Response): Pro
     if (stakedAmount < 10000) {
       await client.query("ROLLBACK");
       res.status(400).json({
-        error: "Cannot renew: staked balance is below 10,000 $AVYR minimum",
+        error: "Cannot renew: staked balance is below 10,000 $AVYRO minimum",
         code: "INSUFFICIENT_STAKE",
       });
       return;
@@ -322,7 +322,7 @@ stakingRouter.post("/v1/staking/renew", async (req: Request, res: Response): Pro
   }
 });
 
-// 5. Unstake $AVYR and Return from Platform Pool Wallet
+// 5. Unstake $AVYRO and Return from Platform Pool Wallet
 stakingRouter.post("/v1/staking/unstake", async (req: Request, res: Response): Promise<void> => {
   const { walletAddress, amount } = req.body;
 
@@ -362,13 +362,13 @@ stakingRouter.post("/v1/staking/unstake", async (req: Request, res: Response): P
     if (numAmount > currentStaked) {
       await client.query("ROLLBACK");
       res.status(400).json({
-        error: `Cannot unstake ${numAmount} $AVYR. Currently staked: ${currentStaked} $AVYR`,
+        error: `Cannot unstake ${numAmount} $AVYRO. Currently staked: ${currentStaked} $AVYRO`,
         code: "EXCEEDS_STAKED_BALANCE",
       });
       return;
     }
 
-    // The stake is debited here and the AVYR transfer is broadcast after this
+    // The stake is debited here and the AVYRO transfer is broadcast after this
     // transaction commits. Settling inside the transaction would hold a row lock
     // across a network round trip, and a crash mid-broadcast could leave the
     // ledger and the chain disagreeing with no record of which way.
@@ -428,7 +428,7 @@ stakingRouter.post("/v1/staking/unstake", async (req: Request, res: Response): P
 });
 
 /**
- * Sends unstaked AVYR back from the pool wallet.
+ * Sends unstaked AVYRO back from the pool wallet.
  *
  * Runs after the debit has committed, so the ledger always has a durable record
  * of what is owed. A failure restores the user's stake and marks the event
@@ -443,7 +443,7 @@ async function settleUnstake(
   const fail = async (error: string) => {
     try {
       await pool.query("BEGIN");
-      // Give the stake back; the user still holds it until AVYR actually moves.
+      // Give the stake back; the user still holds it until AVYRO actually moves.
       await pool.query(
         `UPDATE staking_records SET staked_amount = staked_amount + $2, updated_at = NOW()
          WHERE wallet_address = $1`,
@@ -470,18 +470,18 @@ async function settleUnstake(
     return fail((err as Error).message);
   }
   if (!signer) {
-    return fail("Pool wallet signer is not configured, so AVYR could not be returned");
+    return fail("Pool wallet signer is not configured, so AVYRO could not be returned");
   }
 
-  // The pool also custodies other stakers' AVYR, so a transfer that would
+  // The pool also custodies other stakers' AVYRO, so a transfer that would
   // overdraw it is refused up front rather than broadcast to revert.
   try {
     const balance = await getPoolAvyrBalance();
     if (balance < amountWei) {
-      return fail(`Pool holds ${balance} AVYR wei, which is less than the ${amountWei} owed`);
+      return fail(`Pool holds ${balance} AVYRO wei, which is less than the ${amountWei} owed`);
     }
   } catch (err) {
-    return fail(`Could not read pool AVYR balance: ${(err as Error).message}`);
+    return fail(`Could not read pool AVYRO balance: ${(err as Error).message}`);
   }
 
   try {
@@ -492,12 +492,12 @@ async function settleUnstake(
       args: [recipient, amountWei],
     });
 
-    await publicClient.call({ account: POOL_ADDRESS, to: AVYR_TOKEN_ADDRESS, data });
+    await publicClient.call({ account: POOL_ADDRESS, to: AVYRO_TOKEN_ADDRESS, data });
 
     const txHash = await signer.client.sendTransaction({
       account: signer.account,
       chain: null,
-      to: AVYR_TOKEN_ADDRESS,
+      to: AVYRO_TOKEN_ADDRESS,
       data,
     });
 

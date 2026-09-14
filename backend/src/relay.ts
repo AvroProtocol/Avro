@@ -19,9 +19,9 @@ export const BRIDGE_CHAIN_NAMES: Record<number, string> = {
 
 export const NATIVE_CURRENCY = "0x0000000000000000000000000000000000000000";
 
-/** AVYR (Avyro) on Robinhood Chain. */
-export const AVYR_ADDRESS = process.env.AVYR_TOKEN_ADDRESS?.trim() || "0xee2ddd7128c291b027712eca157b3ff31a55a05a";
-export const AVYR_DECIMALS = 18;
+/** AVYRO (Avyro) on Robinhood Chain. */
+export const AVYRO_ADDRESS = process.env.AVYRO_TOKEN_ADDRESS?.trim() || "";
+export const AVYRO_DECIMALS = 18;
 export const SETTLEMENT_CHAIN_ID = 4663;
 
 /** Share of the relayer spread rebated to the user, in basis points. */
@@ -99,11 +99,11 @@ export function calculateRebateMicros(spreadMicros: bigint, rebateBps = REBATE_B
   return (spreadMicros * BigInt(rebateBps)) / 10_000n;
 }
 
-/** Converts a micro-USD amount into AVYR wei at the supplied AVYR/USD price. */
+/** Converts a micro-USD amount into AVYRO wei at the supplied AVYRO/USD price. */
 export function microsToAvyrWei(micros: bigint, avyrUsdPrice: string | number): bigint {
   const priceMicros = usdToMicros(avyrUsdPrice);
   if (micros <= 0n || priceMicros <= 0n) return 0n;
-  return (micros * 10n ** BigInt(AVYR_DECIMALS)) / priceMicros;
+  return (micros * 10n ** BigInt(AVYRO_DECIMALS)) / priceMicros;
 }
 
 export interface QuoteParams {
@@ -158,23 +158,23 @@ export async function fetchRelayStatus(requestId: string): Promise<RelayIntentSt
 }
 
 /**
- * AVYR/USD pricing.
+ * AVYRO/USD pricing.
  *
- * AVYR has roughly $4.8k of on-chain liquidity, so spot price is cheap to move.
- * That matters because a *lower* AVYR price pays out *more* AVYR for the same
+ * AVYRO has roughly $4.8k of on-chain liquidity, so spot price is cheap to move.
+ * That matters because a *lower* AVYRO price pays out *more* AVYRO for the same
  * USD rebate - so anyone holding confirmed rebates has an incentive to push the
  * price down just before claiming.
  *
- * Claims are therefore priced against AVYR_USD_REFERENCE_PRICE and the live
- * quote is only accepted when it sits within AVYR_PRICE_MAX_DEVIATION_BPS of it.
+ * Claims are therefore priced against AVYRO_USD_REFERENCE_PRICE and the live
+ * quote is only accepted when it sits within AVYRO_PRICE_MAX_DEVIATION_BPS of it.
  */
 
 /** Operator-set reference price. Required before any claim can be priced. */
-export const AVYR_REFERENCE_PRICE = process.env.AVYR_USD_REFERENCE_PRICE?.trim() || "";
+export const AVYRO_REFERENCE_PRICE = process.env.AVYRO_USD_REFERENCE_PRICE?.trim() || "";
 
 /** How far live spot may drift from the reference before a claim is refused. */
-export const AVYR_PRICE_MAX_DEVIATION_BPS = Number(
-  process.env.AVYR_PRICE_MAX_DEVIATION_BPS || 2000
+export const AVYRO_PRICE_MAX_DEVIATION_BPS = Number(
+  process.env.AVYRO_PRICE_MAX_DEVIATION_BPS || 2000
 ); // 20%
 
 export type AvyrPriceSource = "configured" | "relay" | "reference";
@@ -191,17 +191,18 @@ export interface AvyrPriceResult {
   rejection: string | null;
 }
 
-/** Live AVYR spot from Relay's currency feed, or null when unavailable. */
+/** Live AVYRO spot from Relay's currency feed, or null when unavailable. */
 export async function fetchAvyrSpotPrice(): Promise<string | null> {
+  if (!/^0x[0-9a-fA-F]{40}$/.test(AVYRO_ADDRESS)) return null;
   try {
-    const response = await fetch(`${RELAY_API_URL}/chains/${SETTLEMENT_CHAIN_ID}/currencies/${AVYR_ADDRESS}`);
+    const response = await fetch(`${RELAY_API_URL}/chains/${SETTLEMENT_CHAIN_ID}/currencies/${AVYRO_ADDRESS}`);
     if (!response.ok) return null;
     const payload = (await response.json()) as { price?: number | string };
     if (payload.price === undefined || !(Number(payload.price) > 0)) return null;
     // Relay returns scientific notation for sub-cent tokens; normalise it.
     return Number(payload.price).toFixed(18).replace(/0+$/, "").replace(/\.$/, "");
   } catch (error) {
-    console.error("[relay] AVYR spot price error:", error);
+    console.error("[relay] AVYRO spot price error:", error);
     return null;
   }
 }
@@ -215,13 +216,13 @@ export function deviationBps(price: bigint, reference: bigint): number {
 /**
  * Resolves the price a claim should be settled at.
  *
- * A pinned AVYR_USD_PRICE short-circuits everything (useful for a fixed-rate
+ * A pinned AVYRO_USD_PRICE short-circuits everything (useful for a fixed-rate
  * promotion). Otherwise live spot is checked against the reference and refused
  * when it has drifted too far in either direction.
  */
 export async function resolveAvyrPrice(): Promise<AvyrPriceResult> {
-  const pinned = process.env.AVYR_USD_PRICE?.trim();
-  const reference = AVYR_REFERENCE_PRICE;
+  const pinned = process.env.AVYRO_USD_PRICE?.trim();
+  const reference = AVYRO_REFERENCE_PRICE;
 
   if (pinned && Number(pinned) > 0) {
     return {
@@ -242,7 +243,7 @@ export async function resolveAvyrPrice(): Promise<AvyrPriceResult> {
       spotPrice: null,
       deviationBps: null,
       rejection:
-        "AVYR_USD_REFERENCE_PRICE is not set, so a claim cannot be priced safely against a thin market",
+        "AVYRO_USD_REFERENCE_PRICE is not set, so a claim cannot be priced safely against a thin market",
     };
   }
 
@@ -260,14 +261,14 @@ export async function resolveAvyrPrice(): Promise<AvyrPriceResult> {
   }
 
   const drift = deviationBps(usdToMicros(spot), usdToMicros(reference));
-  if (drift > AVYR_PRICE_MAX_DEVIATION_BPS) {
+  if (drift > AVYRO_PRICE_MAX_DEVIATION_BPS) {
     return {
       price: "0",
       source: "relay",
       referencePrice: reference,
       spotPrice: spot,
       deviationBps: drift,
-      rejection: `AVYR spot price deviates ${drift}bps from the reference (max ${AVYR_PRICE_MAX_DEVIATION_BPS}bps)`,
+      rejection: `AVYRO spot price deviates ${drift}bps from the reference (max ${AVYRO_PRICE_MAX_DEVIATION_BPS}bps)`,
     };
   }
 

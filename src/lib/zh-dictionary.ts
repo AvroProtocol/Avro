@@ -61,7 +61,7 @@ export const ZH_DICTIONARY: Record<string, string> = {
   "— destination gas": "— 目标链 Gas",
   "— relayer spread": "— 中继价差",
   "Your rebate": "您的返利",
-  "$0.0174 in AVYR": "价值 $0.0174 的 AVYR",
+  "$0.0174 in AVYRO": "价值 $0.0174 的 AVYRO",
   "Base → Robinhood Chain": "Base → Robinhood Chain",
   "Bridge through Avyro Protocol": "通过 Avyro Protocol 桥接",
   "Move ETH or USDG between Ethereum, Base, Arbitrum and Robinhood Chain. Routing and quotes come from Relay.":
@@ -69,12 +69,12 @@ export const ZH_DICTIONARY: Record<string, string> = {
   "The spread is measured, not estimated": "价差为实测值，而非估算值",
   "Every quote separates destination gas from the relayer's margin. Only that margin - the spread - is rebated.":
     "每笔报价都会将目标链 Gas 与中继方的利润分开列示。仅对该利润（即价差）进行返利。",
-  "Claim in AVYR on Robinhood Chain": "在 Robinhood Chain 上领取 AVYR",
-  "Rebates accrue once a bridge settles and are claimable in AVYR, with the amount fixed at the price on claim.":
-    "桥接结算后返利即开始累积，可按领取时的价格折算为 AVYR 领取。",
-  "Figures from a live Relay quote. Rebates accrue per bridge and are claimable in AVYR on Robinhood Chain once the bridge settles.":
-    "数据取自 Relay 实时报价。返利按每笔桥接累积，桥接结算后即可在 Robinhood Chain 上以 AVYR 领取。",
-  "AVYR token • 18 decimals • Robinhood Chain": "AVYR 代币 • 18 位小数 • Robinhood Chain",
+  "Claim in AVYRO on Robinhood Chain": "在 Robinhood Chain 上领取 AVYRO",
+  "Rebates accrue once a bridge settles and are claimable in AVYRO, with the amount fixed at the price on claim.":
+    "桥接结算后返利即开始累积，可按领取时的价格折算为 AVYRO 领取。",
+  "Figures from a live Relay quote. Rebates accrue per bridge and are claimable in AVYRO on Robinhood Chain once the bridge settles.":
+    "数据取自 Relay 实时报价。返利按每笔桥接累积，桥接结算后即可在 Robinhood Chain 上以 AVYRO 领取。",
+  "AVYRO token • 18 decimals • Robinhood Chain": "AVYRO 代币 • 18 位小数 • Robinhood Chain",
 
   /* ---------- Hero ---------- */
   "Private payments. Non-custodial. On Robinhood Chain.": "隐私支付。非托管。基于 Robinhood Chain。",
@@ -480,13 +480,13 @@ export const ZH_DICTIONARY: Record<string, string> = {
 
   /* ---------- Redesigned Avyro website ---------- */
   Developers: "开发者",
-  "$AVYR": "$AVYR",
+  "$AVYRO": "$AVYRO",
   "Built for Robinhood Chain": "专为 Robinhood Chain 构建",
   "Private payments.": "隐私支付。",
   "Non-custodial by design.": "生而非托管。",
   "Hold, send, swap and recover frontier assets with 2-of-3 threshold security, smart-account execution and a privacy stack designed for real operations.": "通过 2/3 门限安全、智能账户执行和面向真实业务的隐私技术栈，持有、发送、兑换并恢复前沿资产。",
   "Explore protocol": "探索协议",
-  "$AVYR coin page": "$AVYR 代币页面",
+  "$AVYRO coin page": "$AVYRO 代币页面",
   "Smart accounts": "智能账户",
   "Security that feels like a normal wallet.": "像普通钱包一样自然的安全体验。",
   "Avyro coordinates custody, policy, privacy and recovery without handing control to a custodian.": "Avyro 将托管、策略、隐私与恢复整合在一个体验中，同时不把控制权交给托管方。",

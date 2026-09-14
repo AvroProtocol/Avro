@@ -11,7 +11,7 @@ Viem-native TypeScript SDK enabling developers to embed AVYRO PROTOCOL 2-of-3 th
 - **In-App Spending Guardrails**: Configurable daily and per-transaction limits with 24-hour rolling velocity tracking.
 - **Disposable Payment Links**: Escrowed burner-address paylinks for privacy-preserving payments with zero main address exposure.
 - **Private Address Book**: Encrypted local counterparty storage with categorization and search.
-- **Gasless Staking & Cross-Chain Bridging**: Protocol staking tier calculations and cross-chain bridge quote with AVYR relayer rebate math.
+- **Gasless Staking & Cross-Chain Bridging**: Protocol staking tier calculations and cross-chain bridge quote with AVYRO relayer rebate math.
 
 ## Installation
 
@@ -237,7 +237,7 @@ console.log("Contact name:", match?.name);
 
 ### Gasless Staking Tiers
 
-Calculate monthly transaction quotas based on staked $AVYR:
+Calculate monthly transaction quotas based on staked $AVYRO:
 
 ```typescript
 import {
@@ -254,7 +254,7 @@ console.log("Active stake:", status.stakedAmount, "Pass active:", status.isActiv
 
 ### Cross-Chain Bridge Quotes with Relayer Rebate
 
-Estimate cross-chain bridging routes via Relay.link with automated $AVYR rebates on the relayer margin:
+Estimate cross-chain bridging routes via Relay.link with automated $AVYRO rebates on the relayer margin:
 
 ```typescript
 import {
@@ -270,7 +270,7 @@ const quote = await quoteBridgeWithRebate({
 });
 
 console.log("Spread USD:", quote.rebate.spreadUsd);
-console.log("Rebate USD in AVYR:", quote.rebate.rebateUsd);
+console.log("Rebate USD in AVYRO:", quote.rebate.rebateUsd);
 ```
 
 ## Network Constants

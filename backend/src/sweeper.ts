@@ -161,7 +161,7 @@ export async function checkAndSweepPaylink(slug: string): Promise<SweepResult> {
         value: sendAmount,
       });
     } else {
-      // ERC20 Token (USDG or AVYR)
+      // ERC20 Token (USDG or AVYRO)
       // Check if burner has enough ETH for gas (requires ~25000 gas)
       const burnerEth = await publicClient.getBalance({ address: depositAddress });
       const minGasEth = parseEther("0.000025");

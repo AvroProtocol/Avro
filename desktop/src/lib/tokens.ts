@@ -13,17 +13,18 @@ export interface TokenInfo {
 
 export const USDG_ADDRESS: Address = "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168";
 export const WETH_ADDRESS: Address = "0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73";
-export const AVYR_TOKEN_ADDRESS: Address = "0xee2ddd7128c291b027712eca157b3ff31a55a05a";
+export const AVYRO_TOKEN_ADDRESS: Address = (import.meta.env.VITE_AVYRO_TOKEN_ADDRESS?.trim() || "") as Address;
+export const AVYRO_TOKEN_CONFIGURED = /^0x[0-9a-fA-F]{40}$/.test(AVYRO_TOKEN_ADDRESS);
 
 export const TOKENS: TokenInfo[] = [
-  {
-    symbol: "AVYR",
+  ...(AVYRO_TOKEN_CONFIGURED ? [{
+    symbol: "AVYRO",
     name: "Avyro Protocol",
-    address: AVYR_TOKEN_ADDRESS,
+    address: AVYRO_TOKEN_ADDRESS,
     decimals: 18,
     color: "#3f3f46",
     icon: "/logo.png",
-  },
+  } as TokenInfo] : []),
   {
     symbol: "USDG",
     name: "Global Dollar",

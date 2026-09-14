@@ -2,14 +2,14 @@
 """
 Avyro Public Repo Sync Script
 ================================
-Syncs the local `master` branch to the public Open Source repository (AvyroProtocol/AvyroProtocol)
+Syncs the local `master` branch to the public Open Source repository (AvyroProtocol/Avyro)
 while rewriting all commit authors & committers to:
   Avyro <dbantifun@gmail.com>
 
 Commit messages are also scrubbed of AI-assistant attribution trailers so the
 public mirror carries only the project's own authorship.
 
-Keeps the primary `origin` (AvyroProtocol/AvyroProtocol) untouched for Lovable compatibility.
+Keeps the primary `origin` (AvyroProtocol/Avyro) untouched for Lovable compatibility.
 """
 
 import os

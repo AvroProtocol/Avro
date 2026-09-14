@@ -1,5 +1,5 @@
 -- Cross-chain bridge rebates: users earn a share of the Relay relayer spread,
--- accrued in micro-USD and paid out in AVYR on Robinhood Chain.
+-- accrued in micro-USD and paid out in AVYRO on Robinhood Chain.
 
 CREATE TABLE IF NOT EXISTS bridge_rebates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS rebate_claims (
   user_address VARCHAR(42) NOT NULL,
   -- Total USD value claimed, summed from the accruals attached to this claim.
   amount_micros_usd BIGINT NOT NULL,
-  -- AVYR owed, fixed at claim time using the price below.
+  -- AVYRO owed, fixed at claim time using the price below.
   avyr_wei NUMERIC(78, 0) NOT NULL,
   avyr_usd_price NUMERIC(38, 18) NOT NULL,
   settlement_chain_id INTEGER NOT NULL DEFAULT 4663,

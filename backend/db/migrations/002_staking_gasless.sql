@@ -1,5 +1,5 @@
 -- Migration: 002_staking_gasless.sql
--- Description: Adds tables for AVYR staking, manual monthly renewal, and gas sponsorship audit
+-- Description: Adds tables for AVYRO staking, manual monthly renewal, and gas sponsorship audit
 
 CREATE TABLE IF NOT EXISTS staking_records (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

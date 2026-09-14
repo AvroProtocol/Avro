@@ -352,7 +352,7 @@ downloadsRouter.get("/v1/downloads/mobile/latest", async (_req: Request, res: Ex
       return;
     }
 
-    // Fallback to GitHub Actions build artifact on AvyroProtocol/AvyroProtocol
+    // Fallback to GitHub Actions build artifact on AvyroProtocol/Avyro
     const artMatch = await fetchLatestArtifact("android");
     if (artMatch) {
       const downloadUrl = await getArtifactDownloadUrl(artMatch.artifact, artMatch.repo);
@@ -512,7 +512,7 @@ downloadsRouter.get("/v1/downloads/:platform", async (req: Request, res: Express
       }
     }
 
-    // 2. Fallback: Check workflow run artifacts from GitHub Actions on AvyroProtocol/AvyroProtocol
+    // 2. Fallback: Check workflow run artifacts from GitHub Actions on AvyroProtocol/Avyro
     if (token) {
       const artMatch = await fetchLatestArtifact(rawPlatform);
       if (artMatch) {

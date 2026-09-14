@@ -2351,11 +2351,11 @@ export function App() {
               <Coins className="w-5 h-5" />
             </button>
 
-            {/* Stake $AVYR to Go Gasless (v0.1.7) */}
+            {/* Stake $AVYRO to Go Gasless (v0.1.7) */}
             {isFeatureActive("gasless_staking", appVersion, previewVersion) && (
               <button
                 onClick={() => setActiveTab("gasless")}
-                title="Stake $AVYR to Go Gasless"
+                title="Stake $AVYRO to Go Gasless"
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer relative ${
                   activeTab === "gasless"
                     ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
@@ -2491,7 +2491,7 @@ export function App() {
                     ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
                     : "bg-white/[0.04] text-slate-400 border-white/[0.06] hover:text-white hover:bg-white/[0.08]"
                 }`}
-                title={isGaslessActive ? "100% Gasless Active (Protocol Sponsored)" : "Stake $AVYR to Go Gasless"}
+                title={isGaslessActive ? "100% Gasless Active (Protocol Sponsored)" : "Stake $AVYRO to Go Gasless"}
               >
                 <Zap className={`w-3.5 h-3.5 ${isGaslessActive ? "text-emerald-400 fill-emerald-400/20 animate-pulse" : "text-amber-400"}`} />
                 <span className="hidden sm:inline">
@@ -3113,7 +3113,7 @@ export function App() {
           </div>
         )}
 
-        {/* Tab: Stake $AVYR to Go Gasless (v0.1.7) */}
+        {/* Tab: Stake $AVYRO to Go Gasless (v0.1.7) */}
         {activeTab === "gasless" && wallet && (
           <StakingTab
             wallet={wallet}

@@ -17,7 +17,7 @@ import { parseUnits, formatUnits, encodeFunctionData, type Address, type Hex, ty
 import type { AvyroWallet } from "@avyro/protocol-sdk";
 import { erc20Abi } from "@avyro/protocol-sdk";
 import { executeAccountCall } from "../lib/execute";
-import { AVYR_TOKEN_ADDRESS } from "../lib/tokens";
+import { AVYRO_TOKEN_ADDRESS, AVYRO_TOKEN_CONFIGURED } from "../lib/tokens";
 import {
   calculateStakingTier,
   getStakingConfig,
@@ -58,6 +58,12 @@ export function StakingTab({
   // Fetch token balance and staking status
   const refreshData = useCallback(async () => {
     if (!wallet) return;
+    if (!AVYRO_TOKEN_CONFIGURED) {
+      setAvyrBalance("0.00");
+      setStatus(null);
+      setLoading(false);
+      return;
+    }
     try {
       // 1. Fetch Staking Config
       const config = await getStakingConfig(wallet.apiUrl).catch(() => null);
@@ -69,10 +75,10 @@ export function StakingTab({
       const st = await getStakingStatus(wallet.address, wallet.apiUrl).catch(() => null);
       setStatus(st);
 
-      // 3. Fetch on-chain $AVYR balance
+      // 3. Fetch on-chain $AVYRO balance
       try {
         const bal = await client.readContract({
-          address: AVYR_TOKEN_ADDRESS,
+          address: AVYRO_TOKEN_ADDRESS,
           abi: erc20Abi,
           functionName: "balanceOf",
           args: [wallet.address],
@@ -97,11 +103,15 @@ export function StakingTab({
   const previewAmount = parseFloat(stakeInput) || 0;
   const previewTier = calculateStakingTier(previewAmount);
 
-  // 1. Stake $AVYR
+  // 1. Stake $AVYRO
   const handleStake = async () => {
+    if (!AVYRO_TOKEN_CONFIGURED) {
+      addToast("info", "$AVYRO Not Live Yet", "Set VITE_AVYRO_TOKEN_ADDRESS to the verified deployed contract before staking.");
+      return;
+    }
     const amountNum = parseFloat(stakeInput);
     if (isNaN(amountNum) || amountNum < 10000) {
-      addToast("error", "Minimum 10,000 $AVYR Required", "Please enter at least 10,000 $AVYR to activate gasless transactions.");
+      addToast("error", "Minimum 10,000 $AVYRO Required", "Please enter at least 10,000 $AVYRO to activate gasless transactions.");
       return;
     }
 
@@ -121,7 +131,7 @@ export function StakingTab({
         wallet,
         shardAPrivKey,
         client,
-        target: AVYR_TOKEN_ADDRESS,
+        target: AVYRO_TOKEN_ADDRESS,
         value: 0n,
         data: transferData,
         sponsor: status?.isStaked,
@@ -137,7 +147,7 @@ export function StakingTab({
       addToast(
         "success",
         "Stake Successful",
-        `Staked ${amountNum.toLocaleString()} $AVYR. You now have 100% gasless transactions sponsored by the protocol!`
+        `Staked ${amountNum.toLocaleString()} $AVYRO. You now have 100% gasless transactions sponsored by the protocol!`
       );
       setStakeInput("");
       await refreshData();
@@ -153,7 +163,7 @@ export function StakingTab({
   // 2. Manual Monthly Renewal
   const handleRenew = async () => {
     if (!status?.stakedAmount || status.stakedAmount < 10000) {
-      addToast("error", "Cannot Renew", "You need at least 10,000 $AVYR staked to renew your gasless pass.");
+      addToast("error", "Cannot Renew", "You need at least 10,000 $AVYRO staked to renew your gasless pass.");
       return;
     }
 
@@ -175,16 +185,16 @@ export function StakingTab({
     }
   };
 
-  // 3. Unstake $AVYR
+  // 3. Unstake $AVYRO
   const handleUnstake = async () => {
     const amountNum = parseFloat(unstakeInput);
     if (isNaN(amountNum) || amountNum <= 0) {
-      addToast("error", "Invalid Amount", "Please enter a valid amount of $AVYR to unstake.");
+      addToast("error", "Invalid Amount", "Please enter a valid amount of $AVYRO to unstake.");
       return;
     }
 
     if (amountNum > (status?.stakedAmount || 0)) {
-      addToast("error", "Exceeds Balance", `You only have ${(status?.stakedAmount || 0).toLocaleString()} $AVYR staked.`);
+      addToast("error", "Exceeds Balance", `You only have ${(status?.stakedAmount || 0).toLocaleString()} $AVYRO staked.`);
       return;
     }
 
@@ -197,7 +207,7 @@ export function StakingTab({
       addToast(
         "success",
         "Unstaked Successfully",
-        `Unstaked ${amountNum.toLocaleString()} $AVYR. Tokens have been returned to your wallet.`
+        `Unstaked ${amountNum.toLocaleString()} $AVYRO. Tokens have been returned to your wallet.`
       );
       setUnstakeInput("");
       await refreshData();
@@ -216,6 +226,20 @@ export function StakingTab({
   const isUnlimited = monthlyQuota === -1;
   const quotaPercent = isUnlimited ? 0 : Math.min(100, Math.round((quotaUsed / (monthlyQuota || 1)) * 100));
 
+  if (!AVYRO_TOKEN_CONFIGURED) {
+    return (
+      <div className="flex-1 overflow-y-auto px-6 py-6 max-w-5xl mx-auto">
+        <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-8 text-center">
+          <Coins className="w-10 h-10 mx-auto text-slate-300 mb-4" />
+          <h2 className="text-2xl font-bold text-white">$AVYRO staking is awaiting deployment</h2>
+          <p className="mt-3 text-sm text-slate-400 max-w-xl mx-auto">
+            The previous contract address has been removed. Configure the verified production contract with VITE_AVYRO_TOKEN_ADDRESS before enabling staking.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto px-6 py-6 max-w-5xl mx-auto space-y-6">
       {/* Title & Introduction */}
@@ -223,10 +247,10 @@ export function StakingTab({
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <Zap className="w-6 h-6 text-amber-400 fill-amber-400/20" />
-            Stake $AVYR to Go Gasless
+            Stake $AVYRO to Go Gasless
           </h2>
           <p className="text-sm text-slate-400 mt-1">
-            Stake your $AVYR tokens each month to unlock 100% free transactions sponsored by the protocol.
+            Stake your $AVYRO tokens each month to unlock 100% free transactions sponsored by the protocol.
           </p>
         </div>
         <button
@@ -271,7 +295,7 @@ export function StakingTab({
               {isStaked ? (
                 <span>
                   {(status?.stakedAmount || 0).toLocaleString()}{" "}
-                  <span className="text-lg font-normal text-slate-400">$AVYR Staked</span>
+                  <span className="text-lg font-normal text-slate-400">$AVYRO Staked</span>
                 </span>
               ) : (
                 <span>Zero Gas Fees on Transfers & Swaps</span>
@@ -281,7 +305,7 @@ export function StakingTab({
             <p className="text-sm text-slate-300 max-w-xl">
               {isStaked
                 ? `You do not need native ETH for gas. The protocol sponsors your transactions on Robinhood Chain.`
-                : "Stake at least 10,000 $AVYR to stop paying network fees. You can unstake your tokens anytime."}
+                : "Stake at least 10,000 $AVYRO to stop paying network fees. You can unstake your tokens anytime."}
             </p>
           </div>
 
@@ -337,7 +361,7 @@ export function StakingTab({
                 className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2"
               >
                 <Zap className="w-4 h-4 fill-slate-950" />
-                Stake 10k $AVYR
+                Stake 10k $AVYRO
               </button>
             </div>
           )}
@@ -360,7 +384,7 @@ export function StakingTab({
                 }`}
               >
                 <ArrowDownLeft className="w-4 h-4 text-emerald-400" />
-                Stake $AVYR
+                Stake $AVYRO
               </button>
               <button
                 onClick={() => setActiveTab("unstake")}
@@ -371,7 +395,7 @@ export function StakingTab({
                 }`}
               >
                 <ArrowUpRight className="w-4 h-4 text-rose-400" />
-                Unstake $AVYR
+                Unstake $AVYRO
               </button>
             </div>
 
@@ -381,7 +405,7 @@ export function StakingTab({
                 <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>Enter Amount to Stake</span>
                   <span>
-                    Available in Wallet: <b className="text-white">{avyrBalance} $AVYR</b>
+                    Available in Wallet: <b className="text-white">{avyrBalance} $AVYRO</b>
                   </span>
                 </div>
 
@@ -394,7 +418,7 @@ export function StakingTab({
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-lg font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-400/50 transition-colors"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                    $AVYR
+                    $AVYRO
                   </span>
                 </div>
 
@@ -442,7 +466,7 @@ export function StakingTab({
                   className="w-full py-3.5 rounded-xl bg-[#3f3f46] hover:bg-[#ff574f] disabled:bg-white/10 disabled:text-slate-500 text-white font-bold text-sm transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2"
                 >
                   <Lock className="w-4 h-4" />
-                  {isStaking ? "Staking $AVYR..." : "Stake $AVYR & Activate Gasless"}
+                  {isStaking ? "Staking $AVYRO..." : "Stake $AVYRO & Activate Gasless"}
                 </button>
               </div>
             ) : (
@@ -451,7 +475,7 @@ export function StakingTab({
                 <div className="flex justify-between items-center text-xs text-slate-400">
                   <span>Enter Amount to Unstake</span>
                   <span>
-                    Currently Staked: <b className="text-white">{(status?.stakedAmount || 0).toLocaleString()} $AVYR</b>
+                    Currently Staked: <b className="text-white">{(status?.stakedAmount || 0).toLocaleString()} $AVYRO</b>
                   </span>
                 </div>
 
@@ -472,7 +496,7 @@ export function StakingTab({
                 </div>
 
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  When you unstake, your $AVYR tokens are transferred back to your wallet address. If your remaining staked balance falls below 10,000 $AVYR, gasless transaction sponsorship will pause.
+                  When you unstake, your $AVYRO tokens are transferred back to your wallet address. If your remaining staked balance falls below 10,000 $AVYRO, gasless transaction sponsorship will pause.
                 </p>
 
                 <button
@@ -481,7 +505,7 @@ export function StakingTab({
                   className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:bg-white/5 disabled:text-slate-600 text-white font-bold text-sm transition-all border border-white/10 flex items-center justify-center gap-2"
                 >
                   <ArrowUpRight className="w-4 h-4 text-rose-400" />
-                  {isUnstaking ? "Unstaking..." : "Unstake $AVYR to Wallet"}
+                  {isUnstaking ? "Unstaking..." : "Unstake $AVYRO to Wallet"}
                 </button>
               </div>
             )}
@@ -500,7 +524,7 @@ export function StakingTab({
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5">
                 <div>
                   <div className="font-semibold text-white">Tier 1</div>
-                  <div className="text-[11px] text-slate-400">10,000 $AVYR</div>
+                  <div className="text-[11px] text-slate-400">10,000 $AVYRO</div>
                 </div>
                 <div className="font-mono font-bold text-emerald-400">25 free txns/mo</div>
               </div>
@@ -508,7 +532,7 @@ export function StakingTab({
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5">
                 <div>
                   <div className="font-semibold text-white">Tier 2</div>
-                  <div className="text-[11px] text-slate-400">50,000 $AVYR</div>
+                  <div className="text-[11px] text-slate-400">50,000 $AVYRO</div>
                 </div>
                 <div className="font-mono font-bold text-emerald-400">100 free txns/mo</div>
               </div>
@@ -516,7 +540,7 @@ export function StakingTab({
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5">
                 <div>
                   <div className="font-semibold text-white">+50k Step</div>
-                  <div className="text-[11px] text-slate-400">Every extra 50,000 $AVYR</div>
+                  <div className="text-[11px] text-slate-400">Every extra 50,000 $AVYRO</div>
                 </div>
                 <div className="font-mono font-bold text-emerald-400">+75 free txns/mo</div>
               </div>
@@ -524,7 +548,7 @@ export function StakingTab({
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20">
                 <div>
                   <div className="font-semibold text-amber-300">Tier Unlimited</div>
-                  <div className="text-[11px] text-slate-400">1,000,000+ $AVYR</div>
+                  <div className="text-[11px] text-slate-400">1,000,000+ $AVYRO</div>
                 </div>
                 <div className="font-mono font-bold text-amber-300">Unlimited txns</div>
               </div>
