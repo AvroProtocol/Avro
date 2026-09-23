@@ -1,6 +1,6 @@
 {
   "ticker": "AVRO",
-  "contractAddress": "",
+  "contractAddress": "0xec22B163F74060881DDc5bDa64fD36AE6033876F",
   "buyUrl": "https://www.ponsfamily.com/launchpad/{ca}",
   "xUrl": "https://x.com/Avroproto",
   "githubUrl": "https://github.com/AvroProtocol/Avro"
