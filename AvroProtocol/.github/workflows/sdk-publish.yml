@@ -1,0 +1,56 @@
+name: Publish SDK to NPM
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build, Test and Publish SDK
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: "https://registry.npmjs.org"
+          scope: "@avro"
+
+      - name: Install SDK Dependencies
+        working-directory: ./sdk
+        run: bun install
+
+      - name: Run SDK Unit Tests
+        working-directory: ./sdk
+        run: bun test
+
+      - name: Build TypeScript Distribution
+        working-directory: ./sdk
+        run: bun run build
+
+      - name: Configure NPM Authentication
+        working-directory: ./sdk
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to NPM
+        working-directory: ./sdk
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

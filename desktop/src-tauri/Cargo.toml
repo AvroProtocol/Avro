@@ -1,0 +1,19 @@
+[package]
+name = "avro-desktop"
+version = "0.1.23"
+description = "Avro Protocol Desktop Native Client"
+authors = ["Avro Protocol"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+keyring = "2.1"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
